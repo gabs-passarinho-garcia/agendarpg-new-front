@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "ng serve",
-    "build": "bun ./scripts/set-env.ts && bunx --bun ng build",
+    "build": "bun ./scripts/set-env.ts && ng build",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
     "serve:ssr:agendarpd-new-front": "bun dist/agendarpd-new-front/server/server.mjs"
