@@ -1,0 +1,51 @@
+<div class="registered-events-container">
+  <h1>Minhas Inscricoes</h1>
+
+  @if (loading) {
+    <div class="loading-spinner">
+      <mat-spinner diameter="50"></mat-spinner>
+    </div>
+  } @else {
+    @if (dataSource.data.length === 0) {
+      <div class="no-events">
+        <p>Você não possui inscrições futuras.</p>
+      </div>
+    } @else {
+      <mat-card class="table-card">
+        <div class="table-wrapper">
+          <table mat-table [dataSource]="dataSource" class="activities-table">
+            <ng-container matColumnDef="nome">
+              <th mat-header-cell *matHeaderCellDef>Atividade</th>
+              <td mat-cell *matCellDef="let activity">{{ activity.nome }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="tipo">
+              <th mat-header-cell *matHeaderCellDef>Tipo</th>
+              <td mat-cell *matCellDef="let activity">{{ activity.tipo }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="inicio">
+              <th mat-header-cell *matHeaderCellDef>Início</th>
+              <td mat-cell *matCellDef="let activity">{{ formatDateTime(activity.inicio) }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="fim">
+              <th mat-header-cell *matHeaderCellDef>Fim</th>
+              <td mat-cell *matCellDef="let activity">{{ formatDateTime(activity.fim) }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="local">
+              <th mat-header-cell *matHeaderCellDef>Local</th>
+              <td mat-cell *matCellDef="let activity">{{ activity.localComplemento }}</td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+        </div>
+
+        <mat-paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+      </mat-card>
+    }
+  }
+</div>

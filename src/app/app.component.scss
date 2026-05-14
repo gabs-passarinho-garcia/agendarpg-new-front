@@ -1,0 +1,14 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  overflow: hidden;
+}
+
+app-navi { /* seu header tem altura fixa */ }
+app-footer { /* seu footer tem altura fixa */ }
+
+.app-content {
+  flex: 1;
+  overflow: auto;
+}

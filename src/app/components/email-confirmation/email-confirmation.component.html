@@ -1,0 +1,53 @@
+<div class="confirmation-container">
+  <mat-card class="confirmation-card">
+    <mat-card-header>
+      <div class="header-content">
+        <mat-icon class="email-icon">email</mat-icon>
+        <mat-card-title>Confirme seu Email</mat-card-title>
+      </div>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div class="confirmation-message">
+        <p>
+          Enviamos um link de ativação para o seu email.
+          Clique no link do email para ativar sua conta e começar a usar o sistema.
+        </p>
+
+        <div class="email-info" *ngIf="email">
+          <mat-icon>info</mat-icon>
+          <span>Email enviado para: <strong>{{ email }}</strong></span>
+        </div>
+
+        <div class="instructions">
+          <h3>Não recebeu o email?</h3>
+          <ul>
+            <li>Verifique sua caixa de entrada</li>
+            <li>Verifique a pasta de spam/lixeira</li>
+            <li>Clique no botão abaixo para reenviar</li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button
+          mat-raised-button
+          color="primary"
+          (click)="resendEmail()"
+          [disabled]="loading || !email">
+          <mat-icon *ngIf="!loading">refresh</mat-icon>
+          <mat-icon *ngIf="loading" class="spin">refresh</mat-icon>
+          <span *ngIf="!loading">Reenviar Email</span>
+          <span *ngIf="loading">Enviando...</span>
+        </button>
+
+        <button
+          mat-button
+          (click)="goToLogin()">
+          <mat-icon>login</mat-icon>
+          Ir para Login
+        </button>
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

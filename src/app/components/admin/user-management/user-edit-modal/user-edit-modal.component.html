@@ -1,0 +1,144 @@
+<div class="user-edit-modal">
+  <div class="modal-header">
+    <h2 mat-dialog-title>
+      <mat-icon>edit</mat-icon>
+      Editar Usuário
+    </h2>
+    <button mat-icon-button (click)="close()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content class="modal-content">
+    <form [formGroup]="editForm" class="edit-form">
+      <div class="form-grid">
+        <!-- Nome Completo -->
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Nome Completo</mat-label>
+          <input matInput formControlName="nomeCompleto" placeholder="Digite o nome completo">
+          <mat-icon matPrefix>badge</mat-icon>
+          <mat-error *ngIf="editForm.get('nomeCompleto')?.hasError('required')">
+            Nome é obrigatório
+          </mat-error>
+          <mat-error *ngIf="editForm.get('nomeCompleto')?.hasError('minlength')">
+            Nome deve ter no mínimo 3 caracteres
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Apelido -->
+        <mat-form-field appearance="outline">
+          <mat-label>Apelido</mat-label>
+          <input matInput formControlName="apelido" placeholder="Digite o apelido">
+          <mat-icon matPrefix>tag</mat-icon>
+          <mat-error *ngIf="editForm.get('apelido')?.hasError('required')">
+            Apelido é obrigatório
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Email -->
+        <mat-form-field appearance="outline">
+          <mat-label>Email</mat-label>
+          <input matInput type="email" formControlName="email" placeholder="Digite o email">
+          <mat-icon matPrefix>email</mat-icon>
+          <mat-error *ngIf="editForm.get('email')?.hasError('required')">
+            Email é obrigatório
+          </mat-error>
+          <mat-error *ngIf="editForm.get('email')?.hasError('email')">
+            Email inválido
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Telefone -->
+        <mat-form-field appearance="outline">
+          <mat-label>Telefone</mat-label>
+          <input matInput formControlName="telefone" placeholder="(00)00000-0000"
+                 (input)="applyPhoneMask($event)" maxlength="14">
+          <mat-icon matPrefix>phone</mat-icon>
+          <mat-error *ngIf="editForm.get('telefone')?.hasError('required')">
+            Telefone é obrigatório
+          </mat-error>
+          <mat-error *ngIf="editForm.get('telefone')?.hasError('invalidPhone')">
+            Telefone inválido
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Data de Nascimento -->
+        <mat-form-field appearance="outline">
+          <mat-label>Data de Nascimento</mat-label>
+          <input matInput formControlName="dataDeNascimento" placeholder="dd/mm/yyyy"
+                 (input)="applyDateMask($event)" maxlength="10">
+          <mat-icon matPrefix>cake</mat-icon>
+          <mat-error *ngIf="editForm.get('dataDeNascimento')?.hasError('required')">
+            Data de nascimento é obrigatória
+          </mat-error>
+          <mat-error *ngIf="editForm.get('dataDeNascimento')?.hasError('invalidDate')">
+            Data inválida
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Tipo de Usuário -->
+        <mat-form-field appearance="outline">
+          <mat-label>Tipo de Usuário</mat-label>
+          <mat-select formControlName="tipo">
+            <mat-option *ngFor="let type of userTypes" [value]="type.value">
+              {{ type.label }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix>work</mat-icon>
+          <mat-error *ngIf="editForm.get('tipo')?.hasError('required')">
+            Tipo é obrigatório
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Menor de Idade -->
+        <mat-form-field appearance="outline">
+          <mat-label>Menor de Idade</mat-label>
+          <mat-select formControlName="menor">
+            <mat-option *ngFor="let minor of minorOptions" [value]="minor.value">
+              {{ minor.label }}
+            </mat-option>
+          </mat-select>
+          <mat-icon matPrefix>child_care</mat-icon>
+          <mat-error *ngIf="editForm.get('menor')?.hasError('required')">
+            Campo obrigatório
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Responsável (se menor) -->
+        <mat-form-field appearance="outline" *ngIf="editForm.get('menor')?.value === 'S'">
+          <mat-label>Responsável</mat-label>
+          <input matInput formControlName="responsavel" placeholder="Nome do responsável">
+          <mat-icon matPrefix>supervisor_account</mat-icon>
+          <mat-error *ngIf="editForm.get('responsavel')?.hasError('required')">
+            Responsável é obrigatório para menores
+          </mat-error>
+        </mat-form-field>
+
+        <!-- Telefone do Responsável (se menor) -->
+        <mat-form-field appearance="outline" *ngIf="editForm.get('menor')?.value === 'S'">
+          <mat-label>Telefone do Responsável</mat-label>
+          <input matInput formControlName="telefoneResponsavel" placeholder="(00)00000-0000"
+                 (input)="applyPhoneMask($event)" maxlength="14">
+          <mat-icon matPrefix>contact_phone</mat-icon>
+          <mat-error *ngIf="editForm.get('telefoneResponsavel')?.hasError('required')">
+            Telefone do responsável é obrigatório
+          </mat-error>
+          <mat-error *ngIf="editForm.get('telefoneResponsavel')?.hasError('invalidPhone')">
+            Telefone inválido
+          </mat-error>
+        </mat-form-field>
+      </div>
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="modal-actions">
+    <button mat-stroked-button (click)="close()">
+      <mat-icon>close</mat-icon>
+      Cancelar
+    </button>
+    <button mat-raised-button color="primary" (click)="save()" [disabled]="!editForm.valid">
+      <mat-icon>save</mat-icon>
+      Salvar
+    </button>
+  </mat-dialog-actions>
+</div>

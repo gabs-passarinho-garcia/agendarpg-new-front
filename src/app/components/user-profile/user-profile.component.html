@@ -1,0 +1,187 @@
+<div class="profile-container">
+  <div class="header">
+    <button mat-icon-button (click)="goBack()" class="back-button">
+      <mat-icon>arrow_back</mat-icon>
+    </button>
+    <h1>Meu Perfil</h1>
+    <div class="edit-toggle">
+      <mat-slide-toggle
+        [(ngModel)]="isEditing"
+        (change)="onEditModeChange()"
+        [disabled]="loading"
+        color="primary">
+        <span class="toggle-label">{{ isEditing ? 'Editando' : 'Editar' }}</span>
+      </mat-slide-toggle>
+    </div>
+  </div>
+
+  <!-- Aviso de modo de edição -->
+  <div class="edit-notice" *ngIf="isEditing">
+    <mat-icon>info</mat-icon>
+    <div class="notice-content">
+      <p>Não se esqueça de salvar as mudanças no final da página.</p>
+      <p>Alguns dados como Nome Completo, Data de Nascimento e Tipo de Usuário não podem ser alterados.</p>
+      <p *ngIf="isMinor">Os campos do responsável são obrigatórios para usuários menores de idade.</p>
+    </div>
+  </div>
+
+  <mat-card class="profile-card">
+    <mat-card-header>
+      <div mat-card-avatar class="profile-avatar">
+        <mat-icon>person</mat-icon>
+      </div>
+      <mat-card-title>{{ profileForm.get('apelido')?.value || 'Usuário' }}</mat-card-title>
+      <mat-card-subtitle>{{ profileForm.get('tipo')?.value }}</mat-card-subtitle>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="profileForm" (ngSubmit)="onSave()">
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nome Completo</mat-label>
+            <input matInput
+                   formControlName="nomeCompleto"
+                   readonly
+                   placeholder="Seu nome completo"
+                   title="Nome completo do usuário">
+            <mat-icon matSuffix>person</mat-icon>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Apelido</mat-label>
+            <input matInput
+                   formControlName="apelido"
+                   [readonly]="!isEditing"
+                   placeholder="Como gostaria de ser chamado"
+                   title="Apelido do usuário">
+            <mat-icon matSuffix>badge</mat-icon>
+            <mat-error *ngIf="profileForm.get('apelido')?.hasError('required')">
+              Apelido é obrigatório
+            </mat-error>
+            <mat-error *ngIf="profileForm.get('apelido')?.hasError('minlength')">
+              Apelido deve ter pelo menos 2 caracteres
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Email</mat-label>
+            <input matInput
+                   formControlName="email"
+                   type="email"
+                   [readonly]="!isEditing"
+                   placeholder="seu.email@exemplo.com"
+                   title="Endereço de email do usuário">
+            <mat-icon matSuffix>email</mat-icon>
+            <mat-error *ngIf="profileForm.get('email')?.hasError('required')">
+              Email é obrigatório
+            </mat-error>
+            <mat-error *ngIf="profileForm.get('email')?.hasError('email')">
+              Email deve ter um formato válido
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Telefone</mat-label>
+            <input matInput
+                   formControlName="telefone"
+                   [readonly]="!isEditing"
+                   placeholder="(11) 99999-9999"
+                   (input)="onPhoneInput($event, 'telefone')"
+                   maxlength="15"
+                   title="Número de telefone do usuário">
+            <mat-icon matSuffix>phone</mat-icon>
+            <mat-error *ngIf="profileForm.get('telefone')?.hasError('invalidPhone')">
+              Formato: (11) 99999-9999
+            </mat-error>
+          </mat-form-field>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Data de Nascimento</mat-label>
+            <input matInput
+                   formControlName="dataDeNascimento"
+                   type="text"
+                   readonly
+                   placeholder="dd/mm/aaaa"
+                   title="Data de nascimento do usuário">
+            <mat-icon matSuffix>calendar_today</mat-icon>
+          </mat-form-field>
+        </div>
+
+        <!-- Campos do Responsável - só aparecem para menores de idade -->
+        <div *ngIf="isMinor">
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Nome do Responsável</mat-label>
+              <input matInput
+                     formControlName="responsavel"
+                     [readonly]="!isEditing"
+                     placeholder="Nome completo do responsável"
+                     title="Nome do responsável legal">
+              <mat-icon matSuffix>supervisor_account</mat-icon>
+            </mat-form-field>
+          </div>
+
+          <div class="form-row">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Telefone do Responsável</mat-label>
+              <input matInput
+                     formControlName="telefoneResponsavel"
+                     [readonly]="!isEditing"
+                     placeholder="(11) 99999-9999"
+                     (input)="onPhoneInput($event, 'telefoneResponsavel')"
+                     maxlength="15"
+                     title="Número de telefone do responsável">
+              <mat-icon matSuffix>contact_phone</mat-icon>
+              <mat-error *ngIf="profileForm.get('telefoneResponsavel')?.hasError('invalidPhone')">
+                Formato: (11) 99999-9999
+              </mat-error>
+            </mat-form-field>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Tipo de Usuário</mat-label>
+            <input matInput
+                   formControlName="tipo"
+                   readonly
+                   placeholder="Tipo de usuário"
+                   title="Classificação do tipo de usuário no sistema">
+            <mat-icon matSuffix>admin_panel_settings</mat-icon>
+          </mat-form-field>
+        </div>
+      </form>
+    </mat-card-content>
+
+    <mat-card-actions align="end">
+      <!-- Botão de trocar senha sempre visível -->
+      <button mat-stroked-button color="accent" (click)="openChangePasswordModal()"
+              [disabled]="loading"
+              class="change-password-btn"
+              *ngIf="!isEditing">
+        <mat-icon>lock</mat-icon>
+        Alterar Senha
+      </button>
+
+      <!-- Botões de edição -->
+      <div *ngIf="isEditing" class="edit-actions">
+        <button mat-button (click)="toggleEdit()" [disabled]="loading">
+          Cancelar
+        </button>
+        <button mat-raised-button color="primary" (click)="onSave()"
+                [disabled]="!profileForm.valid || loading">
+          <mat-icon *ngIf="loading">hourglass_empty</mat-icon>
+          {{ loading ? 'Salvando...' : 'Salvar' }}
+        </button>
+      </div>
+    </mat-card-actions>
+  </mat-card>
+</div>

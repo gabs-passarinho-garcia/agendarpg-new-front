@@ -1,0 +1,61 @@
+.event-card {
+  width: 100%;
+  max-width: 320px;
+  margin: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  border-radius: 8px;
+  cursor: pointer;
+  transition: transform .2s, box-shadow .2s;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+  }
+
+  mat-card-header {
+    padding-bottom: 0;
+  }
+
+  mat-card-title {
+    font-size: 1.2rem;
+    color: var(--primary-color, #673ab7);
+  }
+
+  mat-card-subtitle {
+    font-size: .9rem;
+    color: rgba(0,0,0,0.6);
+  }
+
+  .local {
+    margin: 8px 0 4px;
+    font-weight: 500;
+    color: rgba(0,0,0,0.8);
+  }
+
+  .vagas {
+    font-size: .9rem;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: var(--accent-color, #8e6b04);
+  }
+
+  .tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 4px;
+
+    mat-chip {
+      font-size: .75rem;
+      background: rgba(103,58,183,0.1);
+      color: var(--primary-color, #673ab7);
+    }
+  }
+}
+
+/* Responsividade */
+@media (max-width: 599px) {
+  .event-card {
+    max-width: 100%;
+    margin: 8px 0;
+  }
+}

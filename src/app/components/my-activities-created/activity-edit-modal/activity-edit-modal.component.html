@@ -1,0 +1,180 @@
+<div class="activity-edit-modal">
+  <div class="modal-header">
+    <h2 mat-dialog-title>
+      <mat-icon>edit</mat-icon>
+      Editar Atividade
+    </h2>
+    <button mat-icon-button type="button" (click)="cancel()" aria-label="Fechar modal">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content class="modal-content">
+    <form [formGroup]="editForm" class="edit-form">
+      <div class="form-grid">
+        <mat-form-field appearance="outline">
+          <mat-label>Tipo</mat-label>
+          <mat-select formControlName="tipo">
+            @for (type of activityTypes; track type) {
+              <mat-option [value]="type">{{ type }}</mat-option>
+            }
+          </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Nome</mat-label>
+          <input matInput formControlName="nome" placeholder="Nome da atividade">
+          @if (editForm.get('nome')?.hasError('required')) {
+            <mat-error>Nome é obrigatório</mat-error>
+          }
+          @if (editForm.get('nome')?.hasError('minlength')) {
+            <mat-error>Nome deve ter no mínimo 3 caracteres</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Descrição</mat-label>
+          <textarea matInput rows="3" formControlName="descricao" placeholder="Descreva a atividade"></textarea>
+          @if (editForm.get('descricao')?.hasError('required')) {
+            <mat-error>Descrição é obrigatória</mat-error>
+          }
+          @if (editForm.get('descricao')?.hasError('minlength')) {
+            <mat-error>Descrição deve ter no mínimo 5 caracteres</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Data de início</mat-label>
+          <input matInput [matDatepicker]="inicioPicker" formControlName="inicioData" title="Data de início">
+          <mat-datepicker-toggle matSuffix [for]="inicioPicker"></mat-datepicker-toggle>
+          <mat-datepicker #inicioPicker></mat-datepicker>
+          @if (editForm.get('inicioData')?.hasError('required')) {
+            <mat-error>Data de início é obrigatória</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Hora de início</mat-label>
+          <mat-select formControlName="inicioHora">
+            <mat-option [value]="null">Selecione um horário</mat-option>
+            @for (hour of availableHours; track hour) {
+              <mat-option [value]="hour">{{ hour }}</mat-option>
+            }
+          </mat-select>
+          @if (editForm.get('inicioHora')?.hasError('required')) {
+            <mat-error>Hora de início é obrigatória</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Data de fim</mat-label>
+          <input matInput [matDatepicker]="fimPicker" formControlName="fimData" title="Data de fim">
+          <mat-datepicker-toggle matSuffix [for]="fimPicker"></mat-datepicker-toggle>
+          <mat-datepicker #fimPicker></mat-datepicker>
+          @if (editForm.get('fimData')?.hasError('required')) {
+            <mat-error>Data de fim é obrigatória</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline">
+          <mat-label>Hora de fim</mat-label>
+          <mat-select formControlName="fimHora">
+            <mat-option [value]="null">Selecione um horário</mat-option>
+            @for (hour of availableHours; track hour) {
+              <mat-option [value]="hour">{{ hour }}</mat-option>
+            }
+          </mat-select>
+          @if (editForm.get('fimHora')?.hasError('required')) {
+            <mat-error>Hora de fim é obrigatória</mat-error>
+          }
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>Local complementar</mat-label>
+          <input matInput formControlName="localComplemento" placeholder="Sala, auditório, mesa...">
+          @if (editForm.get('localComplemento')?.hasError('required')) {
+            <mat-error>Local complementar é obrigatório</mat-error>
+          }
+        </mat-form-field>
+
+        @if (isRpgActivity) {
+          <mat-form-field appearance="outline">
+            <mat-label>Sistema</mat-label>
+            <input matInput formControlName="sistema" placeholder="D&D 5e">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Número de vagas</mat-label>
+            <input matInput type="number" formControlName="numeroVagas" placeholder="6">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Tags</mat-label>
+            <input
+              matInput
+              formControlName="tagsText"
+              placeholder="Buscar tags disponíveis"
+              (focus)="onTagsInputFocus()"
+              [matAutocomplete]="tagsAuto">
+            <mat-autocomplete #tagsAuto="matAutocomplete" (optionSelected)="addTag($event.option.value)">
+              @if (loadingTags) {
+                <mat-option disabled>
+                  Carregando tags...
+                </mat-option>
+              }
+              @for (tag of getFilteredTags(); track tag.id) {
+                <mat-option [value]="tag">
+                  {{ tag.nome }}
+                </mat-option>
+              }
+              @if (!loadingTags && getFilteredTags().length === 0) {
+                <mat-option disabled>
+                  Nenhuma tag encontrada
+                </mat-option>
+              }
+            </mat-autocomplete>
+            <mat-hint>Selecione uma ou mais tags da lista de sugestões.</mat-hint>
+          </mat-form-field>
+
+          @if (selectedTags.length > 0) {
+            <div class="full-width">
+              <mat-chip-set>
+                @for (tag of selectedTags; track tag.id) {
+                  <mat-chip [removable]="true" (removed)="removeTag(tag)">
+                    {{ tag.nome }}
+                    <button type="button" matChipRemove aria-label="Remover tag">×</button>
+                  </mat-chip>
+                }
+              </mat-chip-set>
+            </div>
+          }
+        }
+
+        @if (isWorkshopActivity) {
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Tema</mat-label>
+            <input matInput formControlName="tema" placeholder="Tema do workshop">
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>ID do palestrante</mat-label>
+            <input matInput type="number" formControlName="palestranteId" placeholder="2">
+          </mat-form-field>
+        }
+      </div>
+
+      @if (editForm.hasError('invalidDateRange')) {
+        <p class="date-error">A data/hora de fim deve ser maior que a data/hora de início.</p>
+      }
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="modal-actions" align="end">
+    <button mat-stroked-button type="button" (click)="cancel()" [disabled]="saving">
+      Cancelar
+    </button>
+    <button mat-raised-button color="primary" type="button" (click)="save()" [disabled]="editForm.invalid || saving">
+      {{ saving ? 'Salvando...' : 'Salvar' }}
+    </button>
+  </mat-dialog-actions>
+</div>

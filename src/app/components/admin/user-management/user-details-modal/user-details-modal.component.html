@@ -1,0 +1,107 @@
+<div class="user-details-modal">
+  <div class="modal-header">
+    <h2 mat-dialog-title>
+      <mat-icon>person</mat-icon>
+      Detalhes do Usuário
+    </h2>
+    <button mat-icon-button (click)="close()" class="close-button">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content class="modal-content">
+    <div class="details-grid">
+      <!-- Nome Completo -->
+      <div class="detail-item">
+        <label>
+          <mat-icon>badge</mat-icon>
+          Nome Completo
+        </label>
+        <p>{{ user.nomeCompleto }}</p>
+      </div>
+
+      <!-- Apelido -->
+      <div class="detail-item">
+        <label>
+          <mat-icon>tag</mat-icon>
+          Apelido
+        </label>
+        <p>{{ user.apelido || 'Não informado' }}</p>
+      </div>
+
+      <!-- Email -->
+      <div class="detail-item">
+        <label>
+          <mat-icon>email</mat-icon>
+          Email
+        </label>
+        <p>{{ user.email }}</p>
+      </div>
+
+      <!-- Telefone -->
+      <div class="detail-item">
+        <label>
+          <mat-icon>phone</mat-icon>
+          Telefone
+        </label>
+        <p>{{ formatPhone(user.telefone) }}</p>
+      </div>
+
+      <!-- Data de Nascimento -->
+      <div class="detail-item">
+        <label>
+          <mat-icon>cake</mat-icon>
+          Data de Nascimento
+        </label>
+        <p>{{ formatDate(user.dataDeNascimento) }}</p>
+      </div>
+
+      <!-- Tipo de Usuário -->
+      <div class="detail-item">
+        <label>
+          <mat-icon>work</mat-icon>
+          Tipo de Usuário
+        </label>
+        <p>
+          <span class="tipo-badge" [ngClass]="'tipo-' + user.tipo">
+            {{ getTipoLabel(user.tipo) }}
+          </span>
+        </p>
+      </div>
+
+      <!-- Menor de Idade -->
+      <div class="detail-item">
+        <label>
+          <mat-icon>child_care</mat-icon>
+          Menor de Idade
+        </label>
+        <p>{{ getMenorLabel(user.menor) }}</p>
+      </div>
+
+      <!-- Responsável (se menor) -->
+      <div class="detail-item" *ngIf="user.responsavel">
+        <label>
+          <mat-icon>supervisor_account</mat-icon>
+          Responsável
+        </label>
+        <p>{{ user.responsavel }}</p>
+      </div>
+
+      <!-- Telefone do Responsável -->
+      <div class="detail-item" *ngIf="user.telefoneResponsavel">
+        <label>
+          <mat-icon>contact_phone</mat-icon>
+          Telefone do Responsável
+        </label>
+        <p>{{ formatPhone(user.telefoneResponsavel) }}</p>
+      </div>
+    </div>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="modal-actions">
+    <button mat-raised-button color="primary" (click)="close()">
+      <mat-icon>check</mat-icon>
+      Fechar
+    </button>
+  </mat-dialog-actions>
+</div>

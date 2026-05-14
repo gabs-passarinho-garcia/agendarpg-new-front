@@ -1,0 +1,75 @@
+<mat-card class="activity-card" (click)="onClick()">
+  <mat-card-header>
+    <div class="header-content">
+      <div class="header-left">
+        <mat-card-title>{{ activity.nome }}</mat-card-title>
+        <mat-card-subtitle>
+          <mat-chip-set aria-label="Tipo de atividade">
+            <mat-chip [highlighted]="activity.tipo === ActivityType.RPG_MESA">
+              {{ tipoLabel }}
+            </mat-chip>
+          </mat-chip-set>
+        </mat-card-subtitle>
+      </div>
+      <div class="header-icon">
+        <mat-icon>
+          @if (activity.tipo === ActivityType.RPG_MESA) {
+            games
+          } @else {
+            school
+          }
+        </mat-icon>
+      </div>
+    </div>
+  </mat-card-header>
+
+  <mat-card-content>
+    <div class="activity-info">
+      <div class="info-item">
+        <mat-icon>schedule</mat-icon>
+        <span>{{ periodo }}</span>
+      </div>
+
+      <div class="info-item">
+        <mat-icon>location_on</mat-icon>
+        <span>{{ activity.localComplemento }}</span>
+      </div>
+
+      <div class="info-item">
+        @if (activity.tipo === ActivityType.RPG_MESA) {
+          <mat-icon>videogame_asset</mat-icon>
+          <span>Sistema: {{ sistemaOuTema }}</span>
+        } @else {
+          <mat-icon>event_note</mat-icon>
+          <span>Tema: {{ sistemaOuTema }}</span>
+        }
+      </div>
+
+      @if (activity.tipo === ActivityType.RPG_MESA && activity.numeroVagas) {
+        <div class="info-item">
+          <mat-icon>group</mat-icon>
+          <span>{{ activity.numeroVagas }} vagas</span>
+        </div>
+      }
+
+      @if (activity.tipo === ActivityType.RPG_MESA && activity.tags && activity.tags.length > 0) {
+        <div class="tags-container">
+          <mat-chip-set aria-label="Tags">
+            @for (tag of activity.tags; track tag) {
+              <mat-chip>{{ tag }}</mat-chip>
+            }
+          </mat-chip-set>
+        </div>
+      }
+
+      <p class="description">{{ activity.descricao }}</p>
+    </div>
+  </mat-card-content>
+
+  <mat-card-actions>
+    <button mat-button color="primary">
+      <mat-icon>info</mat-icon>
+      Ver Detalhes
+    </button>
+  </mat-card-actions>
+</mat-card>

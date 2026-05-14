@@ -1,0 +1,129 @@
+.sidenav-container {
+  height: 100vh;
+}
+
+.sidenav {
+  width: 250px;
+}
+
+.mat-toolbar.mat-primary {
+  position: sticky;
+  top: 0;
+  z-index: 2;
+}
+
+.content {
+  padding: 16px;
+}
+
+.welcome-item {
+  color: var(--primary-color, #673ab7);
+  font-weight: 500;
+  cursor: default;
+  padding: 0 16px; // Mesmo padding dos botões
+  min-height: 48px; // Mesma altura dos botões
+  display: flex;
+  align-items: center;
+
+  &:hover {
+    background: transparent !important;
+  }
+
+  .welcome-content {
+    display: flex;
+    flex-direction: column;
+    line-height: 1.2;
+    margin-left: 8px; // Mesmo espaçamento do ícone para o texto nos botões
+    flex: 1;
+
+    .welcome-text {
+      font-size: 14px; // Mesmo tamanho dos botões
+      color: #999;
+      font-weight: 400;
+      margin-bottom: 1px;
+      line-height: 1.1;
+    }
+
+    .user-name {
+      font-size: 14px; // Mesmo tamanho dos botões
+      color: #673ab7;
+      font-weight: 600;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      max-width: 180px;
+      line-height: 1.2;
+    }
+  }
+
+  // Garante que o ícone tenha o mesmo estilo dos outros itens
+  .mat-icon {
+    color: #673ab7;
+    margin-right: 0; // Remove margin porque já temos no content
+  }
+}
+
+.mat-mdc-list-item {
+  .mat-icon {
+    margin-right: 8px;
+  }
+}
+
+// Estilos para o Painel de Administração
+.admin-panel {
+  // margin: 8px 16px;
+  box-shadow: none !important;
+  background: transparent !important;
+
+  ::ng-deep {
+    .mat-expansion-panel-header {
+      padding: 0 16px;
+      min-height: 48px;
+      font-size: 14px;
+
+      &:hover {
+        background: rgba(0, 0, 0, 0.04);
+      }
+    }
+
+    .mat-expansion-panel-body {
+      padding: 0 !important;
+    }
+
+    .mat-panel-title {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      color: rgba(0, 0, 0, 0.87);
+      font-weight: 500;
+
+      mat-icon {
+        color: #673ab7;
+      }
+    }
+
+    .mat-expansion-indicator {
+      &::after {
+        color: #673ab7;
+      }
+    }
+  }
+}
+
+.admin-menu {
+  padding: 0 !important;
+
+  a {
+    padding-left: 12px !important; // Indentação para mostrar hierarquia
+    font-size: 14px;
+
+    &:hover {
+      background: rgba(103, 58, 183, 0.08);
+    }
+
+    mat-icon {
+      color: #673ab7;
+      opacity: 0.8;
+    }
+  }
+}

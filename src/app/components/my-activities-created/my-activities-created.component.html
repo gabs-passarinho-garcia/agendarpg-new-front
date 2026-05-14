@@ -1,0 +1,66 @@
+<div class="container">
+  <h1>Minhas Atividades</h1>
+
+  @if (loading) {
+    <div class="loading-container">
+      <mat-spinner [diameter]="50"></mat-spinner>
+      <p>Carregando atividades...</p>
+    </div>
+  } @else if (dataSource.data.length === 0) {
+    <mat-card class="empty-state">
+      <mat-card-content>
+        <mat-icon class="empty-icon">event_busy</mat-icon>
+        <h2>Nenhuma atividade criada</h2>
+        <p>Você ainda não criou nenhuma atividade</p>
+      </mat-card-content>
+    </mat-card>
+  } @else {
+    <mat-card class="table-card">
+      <div class="table-wrapper">
+        <table mat-table [dataSource]="dataSource" class="activities-table">
+          <ng-container matColumnDef="nome">
+            <th mat-header-cell *matHeaderCellDef>Nome</th>
+            <td mat-cell *matCellDef="let activity">{{ activity.nome }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="tipo">
+            <th mat-header-cell *matHeaderCellDef>Tipo</th>
+            <td mat-cell *matCellDef="let activity">{{ activity.tipo }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="inicio">
+            <th mat-header-cell *matHeaderCellDef>Início</th>
+            <td mat-cell *matCellDef="let activity">{{ formatDateTime(activity.inicio) }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="fim">
+            <th mat-header-cell *matHeaderCellDef>Fim</th>
+            <td mat-cell *matCellDef="let activity">{{ formatDateTime(activity.fim) }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="local">
+            <th mat-header-cell *matHeaderCellDef>Local</th>
+            <td mat-cell *matCellDef="let activity">{{ activity.localComplemento }}</td>
+          </ng-container>
+
+          <ng-container matColumnDef="acoes">
+            <th mat-header-cell *matHeaderCellDef>Ações</th>
+            <td mat-cell *matCellDef="let activity">
+              <button mat-icon-button color="primary" (click)="editActivity(activity)" matTooltip="Alterar atividade">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button mat-icon-button color="warn" (click)="deleteActivity(activity)" matTooltip="Excluir atividade">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </td>
+          </ng-container>
+
+          <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+          <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+        </table>
+      </div>
+
+      <mat-paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+    </mat-card>
+  }
+</div>

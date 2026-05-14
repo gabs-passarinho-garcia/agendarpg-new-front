@@ -1,0 +1,151 @@
+.register-container {
+  padding: 24px;
+  max-width: 600px;
+  margin: 0 auto;
+
+  mat-card {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+
+  mat-card-title {
+    color: var(--primary-color, #673ab7);
+    font-size: 1.5rem;
+    margin-bottom: 16px;
+  }
+}
+
+form {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.date-type-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.checkbox-field {
+  margin: 8px 0;
+
+  mat-checkbox {
+    color: var(--primary-color, #673ab7);
+  }
+}
+
+.age-info {
+  margin: 16px 0;
+
+  .age-display {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 16px;
+    border-radius: 8px;
+    font-weight: 500;
+
+    &.minor {
+      background: rgba(255, 193, 7, 0.1);
+      color: #ff8f00;
+      border-left: 4px solid #ff8f00;
+
+      mat-icon {
+        color: #ff8f00;
+      }
+    }
+
+    &.adult {
+      background: rgba(76, 175, 80, 0.1);
+      color: #388e3c;
+      border-left: 4px solid #388e3c;
+
+      mat-icon {
+        color: #388e3c;
+      }
+    }
+  }
+}
+
+.responsible-fields {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 16px;
+  background: rgba(103,58,183,0.05);
+  border-radius: 8px;
+  border-left: 4px solid var(--primary-color, #673ab7);
+
+  &::before {
+    content: "Informações do Responsável";
+    font-weight: 500;
+    color: var(--primary-color, #673ab7);
+    margin-bottom: 8px;
+    display: block;
+  }
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+
+  button {
+    min-width: 120px;
+  }
+}
+
+// Responsividade
+@media (max-width: 768px) {
+  .register-container {
+    padding: 16px;
+    max-width: 100%;
+  }
+
+  .date-type-row {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+
+  .form-actions {
+    flex-direction: column;
+
+    button {
+      width: 100%;
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .register-container {
+    padding: 12px;
+  }
+
+  mat-card-title {
+    font-size: 1.25rem;
+  }
+
+  .responsible-fields {
+    padding: 12px;
+  }
+}
+
+// Estilização dos campos
+mat-form-field {
+  width: 100%;
+}
+
+mat-error {
+  font-size: 0.75rem;
+}
+
+// Ícones dos campos
+.mat-mdc-form-field .mat-mdc-form-field-icon-suffix {
+  color: rgba(0,0,0,0.54);
+}
+
+// Loading state
+button[disabled] {
+  opacity: 0.6;
+}

@@ -1,0 +1,11 @@
+<mat-card class="event-card" (click)="openModal()">
+  <mat-card-header>
+    <mat-card-title>{{ event.nome }}</mat-card-title>
+    <mat-card-subtitle>{{ periodo }}</mat-card-subtitle>
+  </mat-card-header>
+
+  <mat-card-content>
+    <p class="local">{{ event.local }}</p>
+    <p class="vagas">Clique para ver atividades e inscricoes</p>
+  </mat-card-content>
+</mat-card>

@@ -1,0 +1,51 @@
+.event-edit-modal {
+  width: 100%;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 8px 0;
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
+  }
+}
+
+.modal-content {
+  padding-top: 8px;
+}
+
+.edit-form {
+  width: 100%;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.full-width {
+  grid-column: 1 / -1;
+}
+
+.date-error {
+  color: #b3261e;
+  margin: 8px 0 0;
+  font-size: 0.9rem;
+}
+
+.modal-actions {
+  padding: 0 24px 20px;
+}
+
+@media (max-width: 720px) {
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+}

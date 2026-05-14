@@ -1,0 +1,77 @@
+<div class="event-modal">
+  <div class="modal-header">
+    <h2 mat-dialog-title>{{ event.nome }}</h2>
+    <button mat-icon-button (click)="onClose()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content class="modal-content">
+    <div class="event-details">
+      <div class="detail-item">
+        <strong>Periodo:</strong> {{ periodText }}
+      </div>
+
+      <div class="detail-item">
+        <strong>Local:</strong> {{ event.local }}
+      </div>
+
+      <div class="detail-item">
+        <strong>Atividades:</strong>
+      </div>
+
+      <div *ngIf="loadingActivities">Carregando atividades...</div>
+      <div *ngIf="!loadingActivities && activities.length === 0">Nenhuma atividade cadastrada para este evento.</div>
+
+      <div class="activity-list" *ngIf="!loadingActivities && activities.length > 0">
+        <div class="activity-item" *ngFor="let activity of activities">
+          <div class="activity-header">
+            <strong>{{ activity.nome }}</strong>
+            <span>{{ activity.tipo }}</span>
+          </div>
+
+          <p>{{ activity.descricao }}</p>
+
+          <div class="detail-item">
+            <strong>Horario:</strong> {{ formatDateTime(activity.inicio) }} - {{ formatDateTime(activity.fim) }}
+          </div>
+
+          <div class="detail-item">
+            <strong>Local:</strong> {{ activity.localComplemento }}
+          </div>
+
+          <div class="detail-item" *ngIf="activity.tipo === activityType.RPG_MESA">
+            <strong>Sistema:</strong> {{ activity.sistema || '-' }}
+          </div>
+
+          <div class="detail-item" *ngIf="activity.tipo === activityType.RPG_MESA">
+            <strong>Vagas:</strong> {{ (activity.participantes || []).length }}/{{ activity.numeroVagas || 0 }}
+          </div>
+
+          <div class="detail-item" *ngIf="activity.tipo === activityType.RPG_MESA && activity.tags && activity.tags.length > 0">
+            <strong>Tags:</strong>
+            <mat-chip-set class="tags">
+              <mat-chip *ngFor="let tag of activity.tags">{{ tag }}</mat-chip>
+            </mat-chip-set>
+          </div>
+
+          <div class="detail-item" *ngIf="activity.tipo === activityType.RPG_MESA">
+            <strong>Narrador:</strong> {{ getNarratorName(activity) }}
+          </div>
+
+          <div class="detail-item" *ngIf="activity.tipo === activityType.WORKSHOP">
+            <strong>Tema:</strong> {{ activity.tema || '-' }}
+          </div>
+
+          <button
+            mat-raised-button
+            [color]="isUserRegistered(activity) ? 'warn' : 'primary'"
+            [disabled]="!canRegister(activity) && !canUnregister(activity)"
+            (click)="isUserRegistered(activity) ? unregister(activity) : register(activity)">
+            {{ actionButtonText(activity) }}
+          </button>
+        </div>
+      </div>
+    </div>
+  </mat-dialog-content>
+</div>

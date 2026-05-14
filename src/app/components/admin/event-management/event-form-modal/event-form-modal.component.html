@@ -1,0 +1,108 @@
+<div class="event-form-modal">
+  <div class="modal-header">
+    <h2 mat-dialog-title>
+      <mat-icon>{{ data.event ? 'edit' : 'add_circle' }}</mat-icon>
+      {{ data.event ? 'Editar Evento' : 'Novo Evento' }}
+    </h2>
+    <button mat-icon-button type="button" (click)="close()" aria-label="Fechar modal">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+
+  <mat-dialog-content class="modal-content">
+    <form [formGroup]="eventForm" class="form-grid">
+      <mat-form-field appearance="outline" class="full-row">
+        <mat-label>Nome do evento</mat-label>
+        <input matInput formControlName="nome" placeholder="Digite o nome do evento">
+        @if (eventForm.get('nome')?.hasError('required')) {
+          <mat-error>Nome é obrigatório</mat-error>
+        }
+        @if (eventForm.get('nome')?.hasError('minlength')) {
+          <mat-error>Nome deve ter no mínimo 3 caracteres</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline" class="full-row">
+        <mat-label>Local</mat-label>
+        <input matInput formControlName="local" placeholder="Digite o local do evento">
+        @if (eventForm.get('local')?.hasError('required')) {
+          <mat-error>Local é obrigatório</mat-error>
+        }
+        @if (eventForm.get('local')?.hasError('minlength')) {
+          <mat-error>Local deve ter no mínimo 3 caracteres</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Data de início</mat-label>
+        <input
+          matInput
+          [matDatepicker]="inicioPicker"
+          formControlName="inicioData"
+          placeholder="dd/mm/aaaa"
+          title="Data de início"
+          (click)="inicioPicker.open()"
+          (focus)="inicioPicker.open()">
+        <mat-datepicker-toggle matSuffix [for]="inicioPicker"></mat-datepicker-toggle>
+        <mat-datepicker #inicioPicker></mat-datepicker>
+        @if (eventForm.get('inicioData')?.hasError('required')) {
+          <mat-error>Data de início é obrigatória</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Hora de início</mat-label>
+        <mat-select formControlName="inicioHora">
+          <mat-option [value]="null">Selecione</mat-option>
+          @for (hour of availableHours; track hour) {
+            <mat-option [value]="hour">{{ hour }}</mat-option>
+          }
+        </mat-select>
+        @if (eventForm.get('inicioHora')?.hasError('required')) {
+          <mat-error>Hora de início é obrigatória</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Data de fim</mat-label>
+        <input
+          matInput
+          [matDatepicker]="fimPicker"
+          formControlName="fimData"
+          placeholder="dd/mm/aaaa"
+          title="Data de fim"
+          (click)="fimPicker.open()"
+          (focus)="fimPicker.open()">
+        <mat-datepicker-toggle matSuffix [for]="fimPicker"></mat-datepicker-toggle>
+        <mat-datepicker #fimPicker></mat-datepicker>
+        @if (eventForm.get('fimData')?.hasError('required')) {
+          <mat-error>Data de fim é obrigatória</mat-error>
+        }
+      </mat-form-field>
+
+      <mat-form-field appearance="outline">
+        <mat-label>Hora de fim</mat-label>
+        <mat-select formControlName="fimHora">
+          <mat-option [value]="null">Selecione</mat-option>
+          @for (hour of availableHours; track hour) {
+            <mat-option [value]="hour">{{ hour }}</mat-option>
+          }
+        </mat-select>
+        @if (eventForm.get('fimHora')?.hasError('required')) {
+          <mat-error>Hora de fim é obrigatória</mat-error>
+        }
+      </mat-form-field>
+
+      @if (eventForm.hasError('invalidDateRange')) {
+        <p class="date-error full-row">A data de fim deve ser maior que a data de início.</p>
+      }
+    </form>
+  </mat-dialog-content>
+
+  <mat-dialog-actions class="modal-actions" align="end">
+    <button mat-stroked-button type="button" (click)="close()">Cancelar</button>
+    <button mat-raised-button color="primary" type="button" (click)="save()" [disabled]="eventForm.invalid">
+      Salvar
+    </button>
+  </mat-dialog-actions>
+</div>

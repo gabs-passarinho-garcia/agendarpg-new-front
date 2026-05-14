@@ -1,0 +1,137 @@
+<div class="new-event-container">
+  <mat-card class="event-card">
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>event</mat-icon>
+        Criar Novo Evento
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <form [formGroup]="eventForm" (ngSubmit)="onSubmit()">
+        <!-- Nome e Local -->
+        <div class="form-section">
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Nome do evento</mat-label>
+            <input matInput formControlName="nome" placeholder="Digite o nome do evento">
+            <mat-icon matPrefix>title</mat-icon>
+            @if (eventForm.get('nome')?.hasError('required')) {
+              <mat-error>Nome e obrigatorio</mat-error>
+            }
+            @if (eventForm.get('nome')?.hasError('minlength')) {
+              <mat-error>Nome deve ter no minimo 3 caracteres</mat-error>
+            }
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-width">
+            <mat-label>Local</mat-label>
+            <input matInput formControlName="local" placeholder="Digite o local do evento">
+            <mat-icon matPrefix>location_on</mat-icon>
+            @if (eventForm.get('local')?.hasError('required')) {
+              <mat-error>Local e obrigatorio</mat-error>
+            }
+            @if (eventForm.get('local')?.hasError('minlength')) {
+              <mat-error>Local deve ter no minimo 3 caracteres</mat-error>
+            }
+          </mat-form-field>
+        </div>
+
+        <!-- Data e Hora -->
+        <div class="form-section">
+          <h3>Data e Horário</h3>
+
+          <div class="datetime-section">
+            <div class="datetime-group">
+              <h4>Inicio</h4>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Data de inicio</mat-label>
+                <input matInput [matDatepicker]="inicioPicker" formControlName="inicioData" placeholder="dd/mm/aaaa" title="Data de inicio">
+                <mat-datepicker-toggle matSuffix [for]="inicioPicker"></mat-datepicker-toggle>
+                <mat-datepicker #inicioPicker></mat-datepicker>
+                @if (eventForm.get('inicioData')?.hasError('required')) {
+                  <mat-error>Data de inicio e obrigatoria</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Horario de inicio</mat-label>
+                <mat-select formControlName="inicioHora">
+                  <mat-option [value]="null">Selecione um horario</mat-option>
+                  @for (hour of availableHours; track hour) {
+                    <mat-option [value]="hour">{{ hour }}</mat-option>
+                  }
+                </mat-select>
+                @if (eventForm.get('inicioHora')?.hasError('required')) {
+                  <mat-error>Horario de inicio e obrigatorio</mat-error>
+                }
+              </mat-form-field>
+            </div>
+
+            <div class="datetime-group">
+              <h4>Fim</h4>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Data de fim</mat-label>
+                <input matInput [matDatepicker]="fimPicker" formControlName="fimData" placeholder="dd/mm/aaaa" title="Data de fim">
+                <mat-datepicker-toggle matSuffix [for]="fimPicker"></mat-datepicker-toggle>
+                <mat-datepicker #fimPicker></mat-datepicker>
+                @if (eventForm.get('fimData')?.hasError('required')) {
+                  <mat-error>Data de fim e obrigatoria</mat-error>
+                }
+              </mat-form-field>
+
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Horario de fim</mat-label>
+                <mat-select formControlName="fimHora">
+                  <mat-option [value]="null">Selecione um horario</mat-option>
+                  @for (hour of availableHours; track hour) {
+                    <mat-option [value]="hour">{{ hour }}</mat-option>
+                  }
+                </mat-select>
+                @if (eventForm.get('fimHora')?.hasError('required')) {
+                  <mat-error>Horario de fim e obrigatorio</mat-error>
+                }
+              </mat-form-field>
+            </div>
+          </div>
+
+          @if (eventForm.hasError('invalidDateRange') && (eventForm.get('fimData')?.touched || eventForm.get('inicioData')?.touched || eventForm.get('inicioHora')?.touched || eventForm.get('fimHora')?.touched)) {
+            <div class="date-range-error">
+              <mat-icon>warning</mat-icon>
+              A data/hora de fim deve ser maior que a data/hora de inicio.
+            </div>
+          }
+        </div>
+
+        <!-- Dica automatica -->
+        <div class="info-box">
+          <mat-icon>info</mat-icon>
+          <span>A duracao padrao sugerida e de 3 horas. Ajuste conforme necessario.</span>
+        </div>
+
+        <!-- Acoes -->
+        <div class="form-actions">
+          <button mat-stroked-button type="button" (click)="onCancel()" [disabled]="submitting">
+            Cancelar
+          </button>
+          @if (submitting) {
+            <button mat-raised-button color="primary" type="button" disabled>
+              <ng-container>
+                <mat-icon>hourglass_empty</mat-icon>
+                Criando...
+              </ng-container>
+            </button>
+          } @else {
+            <button mat-raised-button color="primary" type="submit" [disabled]="eventForm.invalid">
+              <ng-container>
+                <mat-icon>add_event</mat-icon>
+                Criar Evento
+              </ng-container>
+            </button>
+          }
+        </div>
+      </form>
+    </mat-card-content>
+  </mat-card>
+</div>

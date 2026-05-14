@@ -1,0 +1,55 @@
+<div class="my-events-container">
+  <h1>Meus Eventos</h1>
+
+  @if (loading) {
+    <div class="loading-spinner">
+      <mat-spinner diameter="50"></mat-spinner>
+    </div>
+  } @else {
+    @if (dataSource.data.length === 0) {
+      <div class="no-events">
+        <p>Nenhum evento criado encontrado para seu usuário.</p>
+      </div>
+    } @else {
+      <mat-card class="table-card">
+        <div class="table-wrapper">
+          <table mat-table [dataSource]="dataSource" class="events-table">
+            <ng-container matColumnDef="nome">
+              <th mat-header-cell *matHeaderCellDef>Nome</th>
+              <td mat-cell *matCellDef="let event">{{ event.nome }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="local">
+              <th mat-header-cell *matHeaderCellDef>Local</th>
+              <td mat-cell *matCellDef="let event">{{ event.local }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="inicio">
+              <th mat-header-cell *matHeaderCellDef>Início</th>
+              <td mat-cell *matCellDef="let event">{{ formatDateTime(event.inicio) }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="fim">
+              <th mat-header-cell *matHeaderCellDef>Fim</th>
+              <td mat-cell *matCellDef="let event">{{ formatDateTime(event.fim) }}</td>
+            </ng-container>
+
+            <ng-container matColumnDef="acoes">
+              <th mat-header-cell *matHeaderCellDef>Ações</th>
+              <td mat-cell *matCellDef="let event">
+                <button mat-icon-button color="primary" (click)="editEvent(event)" matTooltip="Alterar evento">
+                  <mat-icon>edit</mat-icon>
+                </button>
+              </td>
+            </ng-container>
+
+            <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
+            <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
+          </table>
+        </div>
+
+        <mat-paginator [pageSize]="10" [pageSizeOptions]="[5, 10, 20]" showFirstLastButtons></mat-paginator>
+      </mat-card>
+    }
+  }
+</div>

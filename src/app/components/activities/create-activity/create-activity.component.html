@@ -1,0 +1,179 @@
+<div class="create-activity-container">
+  <mat-card>
+    <mat-card-header>
+      <mat-card-title>
+        <mat-icon>add_circle</mat-icon>
+        Criar Atividade
+      </mat-card-title>
+    </mat-card-header>
+
+    <mat-card-content>
+      <div *ngIf="loading" class="loading-container">
+        <mat-progress-spinner mode="indeterminate" diameter="48"></mat-progress-spinner>
+        <p>Carregando eventos disponíveis...</p>
+      </div>
+
+      <form *ngIf="!loading" [formGroup]="activityForm" (ngSubmit)="submit()" class="activity-form">
+        <div class="empty-state" *ngIf="!hasEligibleEvents">
+          Nenhum evento futuro disponível para criar atividades.
+        </div>
+
+        <div class="form-grid">
+          <mat-form-field appearance="outline" class="full-row">
+            <mat-label>Evento</mat-label>
+            <mat-select formControlName="eventId" (selectionChange)="selectEvent($event.value)">
+              <mat-option [value]="null">Selecione um evento</mat-option>
+              <mat-option *ngFor="let event of events" [value]="event.id">
+                {{ event.nome }} - {{ event.inicio | date:'dd/MM/yyyy HH:mm' }}
+              </mat-option>
+            </mat-select>
+            <mat-error *ngIf="activityForm.get('eventId')?.hasError('required')">Selecione um evento</mat-error>
+          </mat-form-field>
+
+          <div class="event-summary" *ngIf="selectedEvent">
+            <strong>{{ selectedEvent.nome }}</strong>
+            <span>{{ selectedEvent.local }}</span>
+            <span>{{ selectedEvent.inicio | date:'dd/MM/yyyy HH:mm' }} - {{ selectedEvent.fim | date:'dd/MM/yyyy HH:mm' }}</span>
+          </div>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Tipo</mat-label>
+            <mat-select formControlName="tipo">
+              <mat-option *ngFor="let type of activityTypes" [value]="type">{{ type }}</mat-option>
+            </mat-select>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Nome</mat-label>
+            <input matInput formControlName="nome" placeholder="Nome da atividade">
+            <mat-error *ngIf="activityForm.get('nome')?.hasError('required')">Nome é obrigatório</mat-error>
+            <mat-error *ngIf="activityForm.get('nome')?.hasError('minlength')">Nome deve ter pelo menos 3 caracteres</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline" class="full-row">
+            <mat-label>Descrição</mat-label>
+            <textarea matInput formControlName="descricao" rows="3" placeholder="Descreva a atividade"></textarea>
+            <mat-error *ngIf="activityForm.get('descricao')?.hasError('required')">Descrição é obrigatória</mat-error>
+            <mat-error *ngIf="activityForm.get('descricao')?.hasError('minlength')">Descrição deve ter pelo menos 5 caracteres</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Data de início</mat-label>
+            <input matInput [matDatepicker]="inicioPicker" formControlName="inicioData" title="Data de início">
+            <mat-datepicker-toggle matSuffix [for]="inicioPicker"></mat-datepicker-toggle>
+            <mat-datepicker #inicioPicker></mat-datepicker>
+            <mat-error *ngIf="activityForm.get('inicioData')?.hasError('required')">Data de início é obrigatória</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Hora de início</mat-label>
+            <mat-select formControlName="inicioHora">
+              <mat-option [value]="null">Selecione um horário</mat-option>
+              <mat-option *ngFor="let hour of availableHours" [value]="hour">{{ hour }}</mat-option>
+            </mat-select>
+            <mat-error *ngIf="activityForm.get('inicioHora')?.hasError('required')">Hora de início é obrigatória</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Data de fim</mat-label>
+            <input matInput [matDatepicker]="fimPicker" formControlName="fimData" title="Data de fim">
+            <mat-datepicker-toggle matSuffix [for]="fimPicker"></mat-datepicker-toggle>
+            <mat-datepicker #fimPicker></mat-datepicker>
+            <mat-error *ngIf="activityForm.get('fimData')?.hasError('required')">Data de fim é obrigatória</mat-error>
+          </mat-form-field>
+
+          <mat-form-field appearance="outline">
+            <mat-label>Hora de fim</mat-label>
+            <mat-select formControlName="fimHora">
+              <mat-option [value]="null">Selecione um horário</mat-option>
+              <mat-option *ngFor="let hour of availableHours" [value]="hour">{{ hour }}</mat-option>
+            </mat-select>
+            <mat-error *ngIf="activityForm.get('fimHora')?.hasError('required')">Hora de fim é obrigatória</mat-error>
+          </mat-form-field>
+
+          <div class="date-range-error full-row" *ngIf="activityForm.hasError('invalidDateRange') && (activityForm.get('inicioData')?.touched || activityForm.get('fimData')?.touched || activityForm.get('inicioHora')?.touched || activityForm.get('fimHora')?.touched)">
+            A data/hora de fim deve ser maior que a data/hora de início.
+          </div>
+
+          <mat-form-field appearance="outline" class="full-row">
+            <mat-label>Local complementar</mat-label>
+            <input matInput formControlName="localComplemento" placeholder="Sala, auditório, mesa...">
+            <mat-error *ngIf="activityForm.get('localComplemento')?.hasError('required')">Local complementar é obrigatório</mat-error>
+            <mat-error *ngIf="activityForm.get('localComplemento')?.hasError('minlength')">Informe pelo menos 2 caracteres</mat-error>
+          </mat-form-field>
+
+          <ng-container *ngIf="isRpgActivity">
+            <div class="event-summary full-row narrator-summary" *ngIf="selectedEvent">
+              <strong>Narrador</strong>
+              <span>Será preenchido automaticamente com seu usuário logado.</span>
+            </div>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Sistema</mat-label>
+              <input matInput formControlName="sistema" placeholder="D&D 5e">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>Número de vagas</mat-label>
+              <input matInput type="number" formControlName="numeroVagas" placeholder="6">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline" class="full-row">
+              <mat-label>Tags</mat-label>
+              <input
+                matInput
+                formControlName="tagsText"
+                placeholder="Buscar tags disponíveis"
+                (focus)="onTagsInputFocus()"
+                [matAutocomplete]="tagsAuto">
+              <mat-autocomplete #tagsAuto="matAutocomplete" (optionSelected)="addTag($event.option.value)">
+                <mat-option *ngIf="loadingTags" disabled>
+                  Carregando tags...
+                </mat-option>
+                <mat-option *ngFor="let tag of getFilteredTags()" [value]="tag">
+                  {{ tag.nome }}
+                </mat-option>
+                <mat-option *ngIf="!loadingTags && getFilteredTags().length === 0" disabled>
+                  Nenhuma tag encontrada
+                </mat-option>
+              </mat-autocomplete>
+              <mat-hint>Selecione uma ou mais tags da lista de sugestões.</mat-hint>
+            </mat-form-field>
+
+            <div class="full-row" *ngIf="selectedTags.length > 0">
+              <mat-chip-set>
+                <mat-chip *ngFor="let tag of selectedTags" [removable]="true" (removed)="removeTag(tag)">
+                  {{ tag.nome }}
+                  <button type="button" matChipRemove aria-label="Remover tag">×</button>
+                </mat-chip>
+              </mat-chip-set>
+            </div>
+          </ng-container>
+
+          <ng-container *ngIf="isWorkshopActivity">
+            <mat-form-field appearance="outline" class="full-row">
+              <mat-label>Tema</mat-label>
+              <input matInput formControlName="tema" placeholder="Tema do workshop">
+            </mat-form-field>
+
+            <mat-form-field appearance="outline">
+              <mat-label>ID do palestrante</mat-label>
+              <input matInput type="number" formControlName="palestranteId" placeholder="2">
+            </mat-form-field>
+          </ng-container>
+        </div>
+
+        <div class="form-actions">
+          <button mat-button type="button" (click)="onCancel()">Cancelar</button>
+          <button mat-raised-button color="primary" type="submit" [disabled]="submitting || !hasEligibleEvents">
+            {{ submitting ? 'Salvando...' : 'Criar Atividade' }}
+          </button>
+        </div>
+      </form>
+
+      <div class="empty-state" *ngIf="!loading && events.length === 0">
+        Nenhum evento disponível para criar atividades.
+      </div>
+    </mat-card-content>
+  </mat-card>
+</div>

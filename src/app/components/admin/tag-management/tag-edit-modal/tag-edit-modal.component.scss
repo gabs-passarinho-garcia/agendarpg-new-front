@@ -1,0 +1,40 @@
+.tag-edit-modal {
+  padding-top: 4px;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: 12px;
+
+  h2 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 0;
+    font-size: 22px;
+    font-weight: 600;
+  }
+}
+
+.modal-content {
+  min-width: 360px;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.modal-actions {
+  display: flex;
+  gap: 12px;
+  padding-top: 12px;
+}
+
+@media (max-width: 600px) {
+  .modal-content {
+    min-width: auto;
+  }
+}

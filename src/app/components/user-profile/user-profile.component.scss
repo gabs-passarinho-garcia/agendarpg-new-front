@@ -1,0 +1,280 @@
+.profile-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+
+  .header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+
+    h1 {
+      margin: 0;
+      flex-grow: 1;
+      text-align: center;
+      color: #673ab7;
+      font-weight: 500;
+    }
+
+    .back-button {
+      color: #673ab7;
+    }
+
+    .edit-toggle {
+      display: flex;
+      align-items: center;
+
+      .toggle-label {
+        margin-left: 8px;
+        font-size: 14px;
+        color: #673ab7;
+        font-weight: 500;
+      }
+
+      mat-slide-toggle {
+        .mat-slide-toggle-thumb {
+          background-color: #673ab7;
+        }
+
+        .mat-slide-toggle-bar {
+          background-color: rgba(103, 58, 183, 0.3);
+        }
+
+        &.mat-checked {
+          .mat-slide-toggle-bar {
+            background-color: rgba(103, 58, 183, 0.5);
+          }
+        }
+      }
+    }
+  }
+
+  // Aviso de modo de edição
+  .edit-notice {
+    display: flex;
+    align-items: flex-start;
+    background: linear-gradient(135deg, #e3f2fd, #f3e5f5);
+    border: 1px solid #673ab7;
+    border-radius: 8px;
+    padding: 12px 16px;
+    margin-bottom: 20px;
+    color: #4a148c;
+    font-size: 14px;
+    animation: slideIn 0.3s ease-out;
+
+    mat-icon {
+      margin-right: 12px;
+      margin-top: 2px;
+      color: #673ab7;
+      font-size: 20px;
+      flex-shrink: 0;
+    }
+
+    .notice-content {
+      flex: 1;
+      line-height: 1.4;
+
+      p {
+        margin: 0 0 8px 0;
+
+        &:last-child {
+          margin-bottom: 0;
+        }
+      }
+    }
+  }
+
+  .profile-card {
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+
+    mat-card-header {
+      margin-bottom: 20px;
+
+      .profile-avatar {
+        background: linear-gradient(135deg, #673ab7, #9c27b0);
+        color: white;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 50%;
+        width: 50px;
+        height: 50px;
+
+        mat-icon {
+          font-size: 24px;
+        }
+      }
+
+      mat-card-title {
+        color: #673ab7;
+        font-weight: 600;
+      }
+
+      mat-card-subtitle {
+        text-transform: uppercase;
+        font-weight: 500;
+        letter-spacing: 1px;
+      }
+    }
+
+    .form-row {
+      margin-bottom: 16px;
+
+      .full-width {
+        width: 100%;
+      }
+
+      mat-form-field {
+        mat-icon[matSuffix] {
+          color: #673ab7;
+        }
+
+        input[readonly] {
+          color: #666;
+          cursor: default;
+        }
+
+        &.mat-form-field-disabled {
+          .mat-form-field-label {
+            color: #999;
+          }
+        }
+      }
+    }
+
+    mat-card-actions {
+      padding: 16px 24px;
+      border-top: 1px solid #e0e0e0;
+      margin-top: 20px;
+
+      button {
+        margin-left: 8px;
+
+        &:first-child {
+          margin-left: 0;
+        }
+      }
+    }
+  }
+}
+
+// Responsividade
+@media (max-width: 768px) {
+  .profile-container {
+    padding: 10px;
+    max-width: 100%;
+
+    .profile-card {
+      margin: 0;
+
+      mat-card-content {
+        padding: 16px;
+      }
+
+      .form-row {
+        margin-bottom: 12px;
+      }
+    }
+  }
+}
+
+// Animações
+.profile-card {
+  transition: box-shadow 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+  }
+}
+
+mat-form-field {
+  transition: all 0.3s ease;
+
+  &.mat-focused {
+    .mat-form-field-outline-thick {
+      color: #673ab7;
+    }
+  }
+}
+
+button {
+  transition: all 0.3s ease;
+
+  &:hover:not([disabled]) {
+    transform: translateY(-1px);
+  }
+}
+
+// Animação para o aviso de edição
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// Estilos para ações do card
+mat-card-actions {
+  padding: 1rem 1.5rem;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  border-top: 1px solid #e0e0e0;
+  margin-top: 1rem;
+
+  .change-password-btn {
+    color: #2196F3;
+    border-color: #2196F3;
+    background: rgba(33, 150, 243, 0.05);
+    font-weight: 500;
+    transition: all 0.3s ease;
+
+    &:hover:not(:disabled) {
+      background-color: rgba(33, 150, 243, 0.1);
+      border-color: #1976D2;
+      color: #1976D2;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(33, 150, 243, 0.2);
+    }
+
+    mat-icon {
+      margin-right: 0.5rem;
+    }
+  }  .edit-actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-left: auto;
+  }
+
+  @media (max-width: 480px) {
+    flex-direction: column;
+    gap: 0.5rem;
+
+    .change-password-btn,
+    .edit-actions button {
+      width: 100%;
+    }
+
+    .edit-actions {
+      width: 100%;
+      margin-left: 0;
+
+      button {
+        flex: 1;
+      }
+    }
+  }
+}
+
+// Estilos globais para o dialog
+::ng-deep .change-password-dialog {
+  .mat-mdc-dialog-container {
+    padding: 0;
+    overflow: visible;
+  }
+}

@@ -1,0 +1,98 @@
+<div class="verification-container">
+  <mat-card class="verification-card">
+
+    <!-- Estado de Verificação -->
+    <div *ngIf="isVerifying" class="verifying-state">
+      <mat-card-content>
+        <div class="loading-content">
+          <mat-progress-spinner
+            mode="indeterminate"
+            diameter="60"
+            color="primary">
+          </mat-progress-spinner>
+          <h2>Aguarde enquanto ativamos sua conta</h2>
+          <p>Estamos verificando seu email...</p>
+        </div>
+      </mat-card-content>
+    </div>
+
+    <!-- Estado de Sucesso -->
+    <div *ngIf="isSuccess" class="success-state">
+      <mat-card-header>
+        <div class="header-content">
+          <mat-icon class="success-icon">check_circle</mat-icon>
+          <mat-card-title>Conta Ativada com Sucesso!</mat-card-title>
+        </div>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="success-content">
+          <p>
+            Sua conta foi ativada com sucesso! Agora você pode fazer login
+            no site e usar todas as funcionalidades normalmente.
+          </p>
+
+          <div class="action-buttons">
+            <button
+              mat-raised-button
+              color="primary"
+              (click)="goToLogin()">
+              <mat-icon>login</mat-icon>
+              Fazer Login
+            </button>
+
+            <button
+              mat-button
+              (click)="goToHome()">
+              <mat-icon>home</mat-icon>
+              Ir para Início
+            </button>
+          </div>
+        </div>
+      </mat-card-content>
+    </div>
+
+    <!-- Estado de Erro -->
+    <div *ngIf="isError" class="error-state">
+      <mat-card-header>
+        <div class="header-content">
+          <mat-icon class="error-icon">error</mat-icon>
+          <mat-card-title>Erro na Verificação</mat-card-title>
+        </div>
+      </mat-card-header>
+
+      <mat-card-content>
+        <div class="error-content">
+          <p>{{ errorMessage }}</p>
+
+          <div class="error-actions">
+            <p>Se o problema persistir, tente:</p>
+            <ul>
+              <li>Solicitar um novo email de verificação</li>
+              <li>Verificar se o link está correto</li>
+              <li>Entrar em contato com o suporte</li>
+            </ul>
+          </div>
+
+          <div class="action-buttons">
+            <button
+              mat-raised-button
+              color="primary"
+              (click)="goToLogin()">
+              <mat-icon>login</mat-icon>
+              Ir para Login
+            </button>
+
+            <button
+              mat-button
+              routerLink="/confirmacao-email">
+              <mat-icon>email</mat-icon>
+              Reenviar Email
+            </button>
+          </div>
+        </div>
+      </mat-card-content>
+    </div>
+
+  </mat-card>
+</div>

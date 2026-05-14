@@ -1,0 +1,9 @@
+# Configuração do Bun para o projeto Agenda-RPG
+
+[install]
+# Garante que o Bun use o lockfile e instale dependências de forma consistente
+lockfile = true
+
+[run]
+# Permite que o Bun execute scripts com uma camada de compatibilidade melhor
+node = true

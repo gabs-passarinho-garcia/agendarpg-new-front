@@ -1,0 +1,84 @@
+<div class="cookie-banner-overlay" *ngIf="showBanner">
+  <mat-card class="cookie-banner">
+    <mat-card-content>
+      <div class="cookie-content">
+        <mat-icon class="cookie-icon">cookie</mat-icon>
+        <div class="cookie-text">
+          <h3>Uso de Cookies</h3>
+          <p>
+            Este site pode utilizar cookies para manter você logado entre sessões e melhorar sua experiência.
+            Você pode escolher aceitar ou rejeitar os cookies.
+          </p>
+
+          <div class="cookie-details" *ngIf="!showDetails">
+            <button
+              mat-button
+              color="primary"
+              (click)="toggleDetails()"
+              class="details-button">
+              <mat-icon>expand_more</mat-icon>
+              Ver detalhes dos cookies
+            </button>
+          </div>
+
+          <div class="cookie-details-expanded" *ngIf="showDetails">
+            <button
+              mat-button
+              color="primary"
+              (click)="toggleDetails()"
+              class="details-button">
+              <mat-icon>expand_less</mat-icon>
+              Ocultar detalhes
+            </button>
+
+            <div class="cookie-info">
+              <h4>Cookies utilizados:</h4>
+              <ul class="cookie-list">
+                <li><strong>Token de Autenticação:</strong> Para manter você logado entre as sessões</li>
+                <li><strong>Dados do Usuário:</strong> Para personalizar sua experiência e exibir informações relevantes</li>
+                <li><strong>Consentimento de Cookies:</strong> Para lembrar sua escolha sobre o uso de cookies</li>
+              </ul>
+
+              <h4>Se você aceitar cookies:</h4>
+              <p class="cookie-explanation">
+                Você permanecerá logado mesmo após fechar o navegador, facilitando o acesso futuro ao site.
+                Suas preferências serão lembradas para uma melhor experiência.
+              </p>
+
+              <h4>Se você rejeitar cookies:</h4>
+              <p class="cookie-rights">
+                Você ainda poderá usar todas as funcionalidades do site, incluindo login e navegação.
+                Porém, será necessário fazer login novamente a cada nova sessão do navegador.
+                Seus dados serão armazenados temporariamente apenas durante a sessão atual.
+              </p>
+
+              <h4>Seus direitos:</h4>
+              <p class="cookie-rights">
+                Você pode alterar sua decisão a qualquer momento através do menu "Configurar Cookies".
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </mat-card-content>
+
+    <mat-card-actions class="cookie-actions">
+      <button
+        mat-stroked-button
+        color="primary"
+        (click)="onReject()"
+        class="reject-button">
+        <mat-icon>block</mat-icon>
+        Rejeitar
+      </button>
+      <button
+        mat-raised-button
+        color="primary"
+        (click)="onAccept()"
+        class="accept-button">
+        <mat-icon>check</mat-icon>
+        Aceitar Cookies
+      </button>
+    </mat-card-actions>
+  </mat-card>
+</div>
