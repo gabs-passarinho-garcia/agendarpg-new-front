@@ -1,11 +1,12 @@
 {
+  "$schema": "https://openapi.vercel.sh/vercel.json",
   "version": 2,
+  "bunVersion": "1.x",
   "framework": "angular",
   "installCommand": "bun install",
   "buildCommand": "bun run build",
   "functions": {
     "api/index.ts": {
-      "runtime": "vercel-bun@latest",
       "memory": 1024,
       "maxDuration": 10
     }
