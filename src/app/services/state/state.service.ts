@@ -8,8 +8,10 @@ import { CookieConsentService } from '../cookie-consent/cookie-consent.service';
 })
 export class StateService {
   private readonly TOKEN_COOKIE = 'auth_token';
+  private readonly REFRESH_TOKEN_COOKIE = 'refresh_token';
   private readonly USER_COOKIE = 'user_data';
   private readonly TOKEN_SESSION = 'session_auth_token';
+  private readonly REFRESH_TOKEN_SESSION = 'session_refresh_token';
   private readonly USER_SESSION = 'session_user_data';
 
   private _isLoggedIn: boolean = false;
@@ -78,6 +80,33 @@ export class StateService {
     } else {
       // Fallback para sessionStorage
       this.setTokenInSession(value);
+    }
+  }
+
+  get refreshToken(): string {
+    if (this.cookieConsentService.canUseCookies()) {
+      return this.getCookie(this.REFRESH_TOKEN_COOKIE) || '';
+    } else {
+      return sessionStorage.getItem(this.REFRESH_TOKEN_SESSION) || '';
+    }
+  }
+
+  set refreshToken(value: string) {
+    if (this.cookieConsentService.canUseCookies()) {
+      if (value) {
+        this.setCookie(this.REFRESH_TOKEN_COOKIE, value, {
+          secure: location.protocol === 'https:',
+          sameSite: 'strict'
+        });
+      } else {
+        this.deleteCookie(this.REFRESH_TOKEN_COOKIE);
+      }
+    } else {
+      if (value) {
+        sessionStorage.setItem(this.REFRESH_TOKEN_SESSION, value);
+      } else {
+        sessionStorage.removeItem(this.REFRESH_TOKEN_SESSION);
+      }
     }
   }
 
@@ -196,6 +225,7 @@ export class StateService {
 
   private clearCookies(): void {
     this.deleteCookie(this.TOKEN_COOKIE);
+    this.deleteCookie(this.REFRESH_TOKEN_COOKIE);
     this.deleteCookie(this.USER_COOKIE);
   }
 
@@ -282,6 +312,7 @@ export class StateService {
     }
 
     sessionStorage.removeItem(this.TOKEN_SESSION);
+    sessionStorage.removeItem(this.REFRESH_TOKEN_SESSION);
     sessionStorage.removeItem(this.USER_SESSION);
   }
 }

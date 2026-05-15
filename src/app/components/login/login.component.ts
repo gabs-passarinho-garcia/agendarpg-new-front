@@ -75,7 +75,8 @@ export class LoginComponent {
       this.loginService.login(credentials as LoginModel).subscribe({
         next: (response) => {
           // Primeiro salvar o token
-          this.stateService.token = response.data;
+          this.stateService.token = response.data.accessToken;
+          this.stateService.refreshToken = response.data.refreshToken;
           this.stateService.isLoggedIn = true;
 
           // Depois buscar dados completos do usuário
@@ -108,7 +109,7 @@ export class LoginComponent {
             error: (userError) => {
               console.error('Erro ao buscar dados do usuário:', userError);
               // Fallback: usar dados do token se busca falhar
-              const tokenData = this.decodeJWT(response.data);
+              const tokenData = this.decodeJWT(response.data.accessToken);
               if (tokenData) {
                 this.stateService.userData = {
                   id: tokenData.id,

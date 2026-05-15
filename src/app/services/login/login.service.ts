@@ -5,6 +5,8 @@ import { ResponseModel } from '../../models/response';
 import { HttpClient } from '@angular/common/http';
 import { LoginModel } from '../../models/login';
 
+import { AuthTokenModel } from '../../models/auth';
+
 @Injectable({
   providedIn: 'root'
 })
@@ -15,7 +17,7 @@ export class LoginService {
     private http: HttpClient,
   ) { }
 
-  login(credentials: LoginModel): Observable<ResponseModel<string>> {
-    return this.http.post<ResponseModel<string>>(`${this.API_URL}/login`, credentials);
+  login(credentials: LoginModel): Observable<ResponseModel<AuthTokenModel>> {
+    return this.http.post<ResponseModel<AuthTokenModel>>(`${this.API_URL}/login`, credentials);
   }
 }
