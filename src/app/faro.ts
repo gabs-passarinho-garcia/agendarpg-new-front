@@ -8,7 +8,7 @@ import { environment } from '../environments/environment';
  */
 export const initFaro = () => {
   // SSR Check: Faro is a browser-only SDK
-  if (typeof window === 'undefined') {
+  if (globalThis.window === undefined) {
     return null;
   }
 
@@ -37,7 +37,7 @@ export const initFaro = () => {
       new TracingInstrumentation({
         instrumentationOptions: {
           // Propagate trace context to our API to correlate frontend and backend traces
-          propagateTraceHeaderCorsUrls: [environment.apiUrl],
+          propagateTraceHeaderCorsUrls: [new RegExp(environment.apiUrl + '.*')],
         },
       }),
     ],
