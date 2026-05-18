@@ -7,7 +7,7 @@ import { TagModel } from '../../models/tag.model';
 import { StateService } from '../state/state.service';
 
 export interface TagUpsertPayload {
-  id?: number;
+  id?: string | number;
   tag: string;
 }
 
@@ -42,7 +42,7 @@ export class TagApiService {
     });
   }
 
-  deleteTag(tagId: number): Observable<unknown> {
+  deleteTag(tagId: string | number): Observable<unknown> {
     return this.http.delete<unknown>(`${this.API_URL}/${tagId}`, {
       headers: this.getAuthHeaders()
     });
@@ -83,8 +83,9 @@ export class TagApiService {
         const nome = tag['nome'];
         const tagName = tag['tag'];
         const resolvedName = typeof nome === 'string' ? nome : tagName;
+        const hasValidId = typeof id === 'number' || typeof id === 'string';
 
-        if (typeof id !== 'number' || typeof resolvedName !== 'string') {
+        if (!hasValidId || typeof resolvedName !== 'string') {
           return null;
         }
 

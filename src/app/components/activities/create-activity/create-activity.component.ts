@@ -280,7 +280,7 @@ export class CreateActivityComponent implements OnInit {
 
     if (value.tipo === ActivityType.RPG_MESA) {
       const tags = this.selectedTags.map((tag) => tag.nome.trim()).filter((name) => name.length > 0);
-      const narratorId = this.stateService.userData?.id;
+      const narratorId = this.resolveNarratorId();
 
       if (!value.sistema || !value.numeroVagas || Number(value.numeroVagas) <= 0 || !narratorId || tags.length === 0) {
         this.showError('Para RPG_MESA informe sistema, vagas e tags. O narrador será o usuário logado.');
@@ -289,7 +289,7 @@ export class CreateActivityComponent implements OnInit {
 
       payload.sistema = value.sistema;
       payload.numeroVagas = Number(value.numeroVagas);
-      payload.narradorId = Number(narratorId);
+      payload.narradorId = narratorId;
       payload.tags = tags;
     }
 
@@ -304,6 +304,22 @@ export class CreateActivityComponent implements OnInit {
     }
 
     return payload;
+  }
+
+  private resolveNarratorId(): string | number | null {
+    const userData = this.stateService.userData as unknown as Record<string, unknown> | null | undefined;
+    const candidateId = userData?.['id'] ?? userData?.['userId'] ?? userData?.['usuarioId'];
+
+    if (typeof candidateId === 'number' && Number.isFinite(candidateId)) {
+      return candidateId;
+    }
+
+    if (typeof candidateId === 'string') {
+      const normalizedId = candidateId.trim();
+      return normalizedId.length > 0 ? normalizedId : null;
+    }
+
+    return null;
   }
 
   private dateRangeValidator(): ValidatorFn {

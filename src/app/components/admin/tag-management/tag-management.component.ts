@@ -44,7 +44,7 @@ export class TagManagementComponent implements OnInit {
 
   loading = true;
   saving = false;
-  deletingId: number | null = null;
+  deletingId: string | number | null = null;
   searchTerm = '';
 
   readonly displayedColumns = ['tag', 'acoes'];
@@ -53,7 +53,7 @@ export class TagManagementComponent implements OnInit {
   dataSource = new MatTableDataSource<TagModel>([]);
 
   tagForm = this.fb.group({
-    id: [null as number | null],
+    id: [null as string | number | null],
     tag: ['', [Validators.required, Validators.minLength(2)]]
   });
 
@@ -195,7 +195,7 @@ export class TagManagementComponent implements OnInit {
     });
   }
 
-  trackById(index: number, tag: TagModel): number {
+  trackById(index: number, tag: TagModel): string | number {
     return tag.id;
   }
 

@@ -53,4 +53,14 @@ describe('ActivityCardComponent', () => {
     component.onClick();
     expect(component.cardClicked.emit).toHaveBeenCalledWith(component.activity);
   });
+
+  it('deve indicar lotado quando participantes atingem numero de vagas', () => {
+    component.activity.participantes = [1, 2, 3, 4, 5];
+    expect(component.isFull).toBeTrue();
+  });
+
+  it('nao deve indicar lotado quando ainda ha vagas', () => {
+    component.activity.participantes = [1, 2, 3, 4];
+    expect(component.isFull).toBeFalse();
+  });
 });

@@ -29,6 +29,36 @@
   color: #555;
 }
 
+.no-events-warning {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  text-align: center;
+  padding: 48px 24px;
+  color: #555;
+
+  .warning-icon {
+    font-size: 56px;
+    width: 56px;
+    height: 56px;
+    color: #ff9800;
+  }
+
+  h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    color: #333;
+  }
+
+  p {
+    margin: 0;
+    max-width: 420px;
+    line-height: 1.5;
+  }
+}
+
 .activity-form {
   display: flex;
   flex-direction: column;

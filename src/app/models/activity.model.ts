@@ -12,7 +12,7 @@ export interface ActivityModel {
   sistema?: string | null;
   numeroVagas?: number | null;
   tags?: string[] | null;
-  narradorId?: number | null;
+  narradorId?: string | number | null;
   tema?: string | null;
   palestranteId?: number | null;
   participantes?: number[] | null;

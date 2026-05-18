@@ -30,7 +30,7 @@ import { UserService } from '../../services/user/user.service';
 export class EventModalComponent implements OnInit {
   activities: ActivityModel[] = [];
   loadingActivities = true;
-  narratorNames: Record<number, string> = {};
+  narratorNames: Record<string, string> = {};
   readonly activityType = ActivityType;
 
   constructor(
@@ -79,19 +79,23 @@ export class EventModalComponent implements OnInit {
   preloadNarratorNames(activities: ActivityModel[]): void {
     const narratorIds = activities
       .map(activity => activity.narradorId)
-      .filter((id): id is number => typeof id === 'number');
+      .filter((id): id is string | number => (typeof id === 'number' || typeof id === 'string') && String(id).trim().length > 0);
 
     narratorIds.forEach((id) => {
-      if (this.narratorNames[id]) {
+      const narratorIdAsString = String(id).trim();
+
+      if (this.narratorNames[narratorIdAsString]) {
         return;
       }
 
+      this.narratorNames[narratorIdAsString] = `Narrador #${narratorIdAsString}`;
+
       this.userService.getNarratorName(id).subscribe({
         next: (response) => {
-          this.narratorNames[id] = response.data?.apelido || `Narrador #${id}`;
+          this.narratorNames[narratorIdAsString] = response.data?.apelido || `Narrador #${narratorIdAsString}`;
         },
         error: () => {
-          this.narratorNames[id] = `Narrador #${id}`;
+          this.narratorNames[narratorIdAsString] = `Narrador #${narratorIdAsString}`;
         }
       });
     });
@@ -101,25 +105,29 @@ export class EventModalComponent implements OnInit {
     if (!activity.narradorId) {
       return '-';
     }
-    return this.narratorNames[activity.narradorId] || `Narrador #${activity.narradorId}`;
+    const narratorIdAsString = String(activity.narradorId);
+    return this.narratorNames[narratorIdAsString] || `Narrador #${narratorIdAsString}`;
   }
 
   isUserRegistered(activity: ActivityModel): boolean {
     const userId = this.stateService.userData?.id;
-    if (!this.isLoggedIn || !userId) {
+    if (!this.isLoggedIn || userId === undefined || userId === null) {
       return false;
     }
 
-    return (activity.participantes ?? []).includes(userId);
+    const userIdAsString = String(userId);
+    const participants = activity.participantes ?? [];
+
+    return participants.some((participant) => String(participant) === userIdAsString);
   }
 
   isNarrator(activity: ActivityModel): boolean {
     const userId = this.stateService.userData?.id;
-    if (!this.isLoggedIn || !userId || !activity.narradorId) {
+    if (!this.isLoggedIn || userId === undefined || userId === null || activity.narradorId === undefined || activity.narradorId === null) {
       return false;
     }
 
-    return activity.narradorId === userId;
+    return String(activity.narradorId) === String(userId);
   }
 
   isActivityFull(activity: ActivityModel): boolean {
@@ -127,9 +135,26 @@ export class EventModalComponent implements OnInit {
       return false;
     }
 
-    const total = activity.numeroVagas ?? 0;
+    const total = Math.max(0, activity.numeroVagas ?? 0);
     const enrolled = activity.participantes?.length ?? 0;
     return total > 0 && enrolled >= total;
+  }
+
+  getVacancySlots(activity: ActivityModel): boolean[] {
+    if (activity.tipo !== ActivityType.RPG_MESA) {
+      return [];
+    }
+
+    const total = Math.max(0, activity.numeroVagas ?? 0);
+    const occupied = Math.min(total, Math.max(0, activity.participantes?.length ?? 0));
+
+    return Array.from({ length: total }, (_, index) => index < occupied);
+  }
+
+  getVacancyAriaLabel(activity: ActivityModel): string {
+    const slots = this.getVacancySlots(activity);
+    const occupied = slots.filter(Boolean).length;
+    return `Vagas ocupadas ${occupied} de ${slots.length}`;
   }
 
   isPastActivity(activity: ActivityModel): boolean {

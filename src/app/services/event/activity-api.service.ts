@@ -28,7 +28,7 @@ export class ActivityApiService {
   }
 
   create(eventId: number, payload: CreateActivityPayload): Observable<ResponseModel<ActivityModel>> {
-    return this.http.post<ResponseModel<ActivityModel>>(`${this.BASE_API_URL}/events/${eventId}/activities`, payload, {
+    return this.http.post<ResponseModel<ActivityModel>>(`${this.BASE_API_URL}/events/${eventId}/activities`, this.withNarratorFallback(payload), {
       headers: this.getAuthHeaders()
     });
   }
@@ -61,5 +61,33 @@ export class ActivityApiService {
     return new HttpHeaders({
       Authorization: `Bearer ${this.stateService.token}`
     });
+  }
+
+  private withNarratorFallback(payload: CreateActivityPayload): CreateActivityPayload {
+    if (payload.tipo !== 'RPG_MESA' || payload.narradorId) {
+      return payload;
+    }
+
+    const userData = this.stateService.userData as unknown as Record<string, unknown> | null | undefined;
+    const candidateId = userData?.['id'] ?? userData?.['userId'] ?? userData?.['usuarioId'];
+
+    if (typeof candidateId === 'number' && Number.isFinite(candidateId)) {
+      return {
+        ...payload,
+        narradorId: candidateId
+      };
+    }
+
+    if (typeof candidateId === 'string') {
+      const normalizedId = candidateId.trim();
+      if (normalizedId.length > 0) {
+        return {
+          ...payload,
+          narradorId: normalizedId
+        };
+      }
+    }
+
+    return payload;
   }
 }

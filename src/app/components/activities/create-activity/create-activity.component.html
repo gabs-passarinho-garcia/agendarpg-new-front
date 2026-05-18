@@ -13,11 +13,18 @@
         <p>Carregando eventos disponíveis...</p>
       </div>
 
-      <form *ngIf="!loading" [formGroup]="activityForm" (ngSubmit)="submit()" class="activity-form">
-        <div class="empty-state" *ngIf="!hasEligibleEvents">
-          Nenhum evento futuro disponível para criar atividades.
-        </div>
+      <div *ngIf="!loading && !hasEligibleEvents" class="no-events-warning">
+        <mat-icon class="warning-icon">event_busy</mat-icon>
+        <h3>Nenhum evento futuro disponível</h3>
+        <p>Não é possível criar uma atividade pois não há eventos futuros cadastrados no sistema.</p>
+        <p>Solicite a um <strong>Coordenador</strong> que cadastre um evento e tente novamente após.</p>
+        <button mat-stroked-button color="primary" type="button" (click)="loadEvents()">
+          <mat-icon>refresh</mat-icon>
+          Verificar novamente
+        </button>
+      </div>
 
+      <form *ngIf="!loading && hasEligibleEvents" [formGroup]="activityForm" (ngSubmit)="submit()" class="activity-form">
         <div class="form-grid">
           <mat-form-field appearance="outline" class="full-row">
             <mat-label>Evento</mat-label>
@@ -170,10 +177,6 @@
           </button>
         </div>
       </form>
-
-      <div class="empty-state" *ngIf="!loading && events.length === 0">
-        Nenhum evento disponível para criar atividades.
-      </div>
     </mat-card-content>
   </mat-card>
 </div>

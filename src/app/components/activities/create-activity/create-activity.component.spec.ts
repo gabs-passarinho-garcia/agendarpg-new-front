@@ -309,4 +309,57 @@ describe('CreateActivityComponent', () => {
 
     expect(createSpy).not.toHaveBeenCalled();
   });
+
+  it('deve enviar narradorId string sem converter para numero', () => {
+    const stateService = TestBed.inject(StateService);
+    (stateService.userData as any).id = '4f8aef70-2cb1-4fc6-a6a8-2b7a604f7ed5';
+
+    const activityApiService = TestBed.inject(ActivityApiService);
+    const createSpy = spyOn(activityApiService, 'create').and.returnValue(of({
+      statusCode: 200,
+      data: {
+        id: 14,
+        eventoId: 2,
+        tipo: 'RPG_MESA' as any,
+        nome: 'Mesa UUID',
+        descricao: 'Descricao',
+        inicio: '2026-12-01T10:00:00',
+        fim: '2026-12-01T12:00:00',
+        localComplemento: 'Sala'
+      }
+    }));
+
+    component.events = [
+      {
+        id: 2,
+        nome: 'Evento Futuro',
+        local: 'Centro',
+        inicio: '2026-12-01T08:00:00',
+        fim: '2026-12-01T20:00:00'
+      }
+    ];
+    component.hasEligibleEvents = true;
+    component.selectEvent(2);
+    component.selectedTags = [{ id: 'tag-uuid-1', nome: 'Savage Worlds' }];
+
+    component.activityForm.patchValue({
+      tipo: 'RPG_MESA',
+      nome: 'Mesa UUID',
+      descricao: 'Descricao valida de teste',
+      inicioData: new Date('2026-12-01T00:00:00'),
+      inicioHora: '10:00',
+      fimData: new Date('2026-12-01T00:00:00'),
+      fimHora: '12:00',
+      localComplemento: 'Sala 1',
+      sistema: 'Savage Worlds',
+      numeroVagas: 5,
+      tagsText: 'Savage Worlds'
+    });
+
+    component.submit();
+
+    expect(createSpy).toHaveBeenCalled();
+    const payload = createSpy.calls.mostRecent().args[1];
+    expect(payload.narradorId).toBe('4f8aef70-2cb1-4fc6-a6a8-2b7a604f7ed5');
+  });
 });

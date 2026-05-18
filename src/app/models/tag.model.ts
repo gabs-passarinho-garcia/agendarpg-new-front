@@ -1,5 +1,5 @@
 export interface TagModel {
-  id: number;
+  id: string | number;
   nome: string;
   descricao?: string | null;
   cor?: string | null;

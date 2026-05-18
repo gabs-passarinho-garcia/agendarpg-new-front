@@ -446,7 +446,7 @@ export class EventManagementComponent implements OnInit, OnDestroy {
       sistema: '',
       numeroVagas: null,
       tagsText: '',
-      narradorId: null,
+      narradorId: this.resolveLoggedUserId(),
       tema: '',
       palestranteId: null
     });
@@ -483,15 +483,16 @@ export class EventManagementComponent implements OnInit, OnDestroy {
 
     if (value.tipo === ActivityType.RPG_MESA) {
       const tags = this.selectedTags.map((tag) => tag.nome.trim()).filter((nome) => nome.length > 0);
+      const narratorId = this.normalizeIdentifier(value.narradorId) ?? this.resolveLoggedUserId();
 
-      if (!value.sistema || !value.numeroVagas || value.numeroVagas <= 0 || !value.narradorId || tags.length === 0) {
+      if (!value.sistema || !value.numeroVagas || value.numeroVagas <= 0 || !narratorId || tags.length === 0) {
         this.showError('Para RPG_MESA informe sistema, vagas, ID do narrador e tags.');
         return null;
       }
 
       payload.sistema = value.sistema;
       payload.numeroVagas = Number(value.numeroVagas);
-      payload.narradorId = Number(value.narradorId);
+      payload.narradorId = narratorId;
       payload.tags = tags;
     }
 
@@ -506,6 +507,25 @@ export class EventManagementComponent implements OnInit, OnDestroy {
     }
 
     return payload;
+  }
+
+  private normalizeIdentifier(value: unknown): string | number | null {
+    if (typeof value === 'number' && Number.isFinite(value)) {
+      return value;
+    }
+
+    if (typeof value === 'string') {
+      const normalized = value.trim();
+      return normalized.length > 0 ? normalized : null;
+    }
+
+    return null;
+  }
+
+  private resolveLoggedUserId(): string | number | null {
+    const userData = this.stateService.userData as unknown as Record<string, unknown> | null | undefined;
+    const candidate = userData?.['id'] ?? userData?.['userId'] ?? userData?.['usuarioId'];
+    return this.normalizeIdentifier(candidate);
   }
 
   private dateRangeValidator(dField: string, hField: string, dFimField: string, hFimField: string): ValidatorFn {

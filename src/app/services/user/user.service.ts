@@ -37,11 +37,11 @@ export class UserService {
     );
   }
 
-  getNarratorName(id: number): Observable<ResponseModel<NarratorNicknameModel>> {
+  getNarratorName(id: string | number): Observable<ResponseModel<NarratorNicknameModel>> {
     const token = this.stateService.token
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return this.http.get<ResponseModel<NarratorNicknameModel>>(
-      `${this.API_URL}/narrator-name/${id}`,
+      `${this.API_URL}/narrator-name/${encodeURIComponent(String(id))}`,
       { headers }
     );
   }

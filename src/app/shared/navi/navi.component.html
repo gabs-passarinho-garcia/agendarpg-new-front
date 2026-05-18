@@ -67,7 +67,9 @@
           <mat-icon matListItemIcon>event_note</mat-icon>
           <span matListItemTitle>Meus Eventos</span>
         </a>
+      }
 
+      @if (canCreateActivities) {
         <a mat-list-item routerLink="/minhas-atividades-criadas" (click)="onLinkClick()">
           <mat-icon matListItemIcon>events</mat-icon>
           <span matListItemTitle>Minhas Atividades</span>

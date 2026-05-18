@@ -50,6 +50,13 @@
           <mat-icon>group</mat-icon>
           <span>{{ activity.numeroVagas }} vagas</span>
         </div>
+
+        @if (isFull) {
+          <div class="status-badge full">
+            <mat-icon>warning</mat-icon>
+            <span>Lotado</span>
+          </div>
+        }
       }
 
       @if (activity.tipo === ActivityType.RPG_MESA && activity.tags && activity.tags.length > 0) {

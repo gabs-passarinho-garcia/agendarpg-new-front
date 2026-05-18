@@ -121,7 +121,7 @@ export class UserAdminService {
     );
   }
 
-  deleteUser(userId: number): Observable<ResponseModel<void>> {
+  deleteUser(userId: string | number): Observable<ResponseModel<void>> {
     const token = this.stateService.token;
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return this.http.delete<ResponseModel<void>>(

@@ -54,6 +54,16 @@ export class ActivityCardComponent {
       : this.activity.tema || 'Tema não especificado';
   }
 
+  get isFull(): boolean {
+    if (this.activity.tipo !== ActivityType.RPG_MESA) {
+      return false;
+    }
+
+    const total = this.activity.numeroVagas ?? 0;
+    const occupied = this.activity.participantes?.length ?? 0;
+    return total > 0 && occupied >= total;
+  }
+
   onClick(): void {
     this.cardClicked.emit(this.activity);
   }

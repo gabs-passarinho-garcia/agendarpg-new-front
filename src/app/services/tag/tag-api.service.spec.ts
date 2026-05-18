@@ -66,6 +66,25 @@ describe('TagApiService', () => {
     });
   });
 
+  it('deve aceitar ids UUID no payload de tags', () => {
+    service.getTags().subscribe((tags) => {
+      expect(tags.length).toBe(1);
+      expect(tags[0].id).toBe('c81e728d-9d4c-4f63-af06-7f89cc14862c');
+      expect(tags[0].nome).toBe('Pathfinder');
+    });
+
+    const req = httpMock.expectOne('http://localhost:8080/api/tags');
+    expect(req.request.method).toBe('GET');
+
+    req.flush({
+      statusCode: 200,
+      statusMessage: 'OK',
+      data: [
+        { id: 'c81e728d-9d4c-4f63-af06-7f89cc14862c', tag: 'Pathfinder' }
+      ]
+    });
+  });
+
   it('deve buscar tags com resposta em array puro', () => {
     service.getTags().subscribe((tags) => {
       expect(tags.length).toBe(1);

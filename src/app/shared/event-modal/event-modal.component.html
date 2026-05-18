@@ -45,7 +45,17 @@
           </div>
 
           <div class="detail-item" *ngIf="activity.tipo === activityType.RPG_MESA">
-            <strong>Vagas:</strong> {{ (activity.participantes || []).length }}/{{ activity.numeroVagas || 0 }}
+            <strong>Vagas:</strong>
+            <ng-container *ngIf="getVacancySlots(activity) as slots">
+              <div class="vacancy-icons" [attr.aria-label]="getVacancyAriaLabel(activity)" *ngIf="slots.length > 0; else noVacancyInfo">
+                <mat-icon *ngFor="let filled of slots" [class.filled]="filled" [class.empty]="!filled">
+                  {{ filled ? 'person' : 'person_outline' }}
+                </mat-icon>
+              </div>
+            </ng-container>
+            <ng-template #noVacancyInfo>
+              <span>-</span>
+            </ng-template>
           </div>
 
           <div class="detail-item" *ngIf="activity.tipo === activityType.RPG_MESA && activity.tags && activity.tags.length > 0">

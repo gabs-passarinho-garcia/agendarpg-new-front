@@ -56,12 +56,13 @@ export class NaviComponent {
   }
 
   get canCreateEvents(): boolean {
-    const allowedTypes = ['NRD', 'CRD', 'ADM'];
+    const allowedTypes = ['CRD', 'ADM'];
     return this.isLoggedIn && allowedTypes.includes(this.userType);
   }
 
   get canCreateActivities(): boolean {
-    return this.canCreateEvents;
+    const allowedTypes = ['NRD', 'CRD', 'ADM'];
+    return this.isLoggedIn && allowedTypes.includes(this.userType);
   }
 
   get isAdmin(): boolean {
