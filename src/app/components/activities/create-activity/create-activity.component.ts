@@ -23,6 +23,7 @@ import { ActivityApiService } from '../../../services/event/activity-api.service
 import { EventApiService } from '../../../services/event/event-api.service';
 import { StateService } from '../../../services/state/state.service';
 import { TagApiService } from '../../../services/tag/tag-api.service';
+import { ActivityTypeLabelPipe } from '../../../pipes/activity-type-label.pipe';
 
 @Component({
   selector: 'app-create-activity',
@@ -41,7 +42,8 @@ import { TagApiService } from '../../../services/tag/tag-api.service';
     MatNativeDateModule,
     MatSelectModule,
     MatProgressSpinnerModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    ActivityTypeLabelPipe
   ],
   templateUrl: './create-activity.component.html',
   styleUrls: ['./create-activity.component.scss']
@@ -216,6 +218,10 @@ export class CreateActivityComponent implements OnInit {
       next: () => {
         this.showSuccess('Atividade criada com sucesso.');
         this.resetForm(false);
+        // Redirecionar para home após snackbar ser exibido (1500ms)
+        setTimeout(() => {
+          this.router.navigate(['/']);
+        }, 1500);
       },
       error: (error) => {
         console.error('Erro ao criar atividade:', error);

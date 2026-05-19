@@ -24,8 +24,9 @@
           </mat-error>
         </mat-form-field>
 
-        <button mat-raised-button color="primary" type="submit" [disabled]="loginForm.invalid">
-          Entrar
+        <button mat-raised-button color="primary" type="submit" [disabled]="loginForm.invalid || isLoading" class="login-button">
+          <mat-spinner *ngIf="isLoading" diameter="20" strokeWidth="2"></mat-spinner>
+          <span *ngIf="!isLoading">Entrar</span>
         </button>
         <div class="btns-div">
           <button mat-raised-button color="primary" type="button" (click)="goToRegister()" class="btns-div__btn">

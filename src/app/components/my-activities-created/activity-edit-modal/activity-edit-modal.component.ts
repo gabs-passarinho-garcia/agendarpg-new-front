@@ -15,10 +15,13 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { MatNativeDateModule } from '@angular/material/core';
 import { ActivityModel, UpdateActivityPayload } from '../../../models/activity.model';
 import { ActivityType } from '../../../models/activity-type.enum';
+import { NarratorOption } from '../../../models/narrator-option.model';
 import { TagModel } from '../../../models/tag.model';
 import { ActivityApiService } from '../../../services/event/activity-api.service';
 import { EventUpdateService } from '../../../services/event/event-update.service';
 import { TagApiService } from '../../../services/tag/tag-api.service';
+import { UserService } from '../../../services/user/user.service';
+import { ActivityTypeLabelPipe } from '../../../pipes/activity-type-label.pipe';
 
 @Component({
   selector: 'app-activity-edit-modal',
@@ -36,7 +39,8 @@ import { TagApiService } from '../../../services/tag/tag-api.service';
     MatAutocompleteModule,
     MatChipsModule,
     MatDatepickerModule,
-    MatNativeDateModule
+    MatNativeDateModule,
+    ActivityTypeLabelPipe
   ],
   templateUrl: './activity-edit-modal.component.html',
   styleUrl: './activity-edit-modal.component.scss'
@@ -55,12 +59,16 @@ export class ActivityEditModalComponent implements OnInit {
   selectedTags: TagModel[] = [];
   loadingTags = false;
 
+  narrators: NarratorOption[] = [];
+  loadingNarrators = false;
+
   constructor(
     private readonly fb: FormBuilder,
     private readonly activityApiService: ActivityApiService,
     private readonly eventUpdateService: EventUpdateService,
     private readonly snackBar: MatSnackBar,
     private readonly tagApiService: TagApiService,
+    private readonly userService: UserService,
     private readonly dialogRef: MatDialogRef<ActivityEditModalComponent>,
     @Inject(MAT_DIALOG_DATA) public readonly activity: ActivityModel
   ) {}
@@ -69,6 +77,7 @@ export class ActivityEditModalComponent implements OnInit {
     this.initializeForm();
     this.setupTagsFilter();
     this.loadTags();
+    this.loadNarrators();
   }
 
   get isRpgActivity(): boolean {
@@ -134,7 +143,8 @@ export class ActivityEditModalComponent implements OnInit {
       numeroVagas: [this.activity.numeroVagas ?? null],
       tagsText: [''],
       tema: [this.activity.tema ?? ''],
-      palestranteId: [this.activity.palestranteId ?? null]
+      palestranteId: [this.activity.palestranteId ?? null],
+      narradorId: [this.activity.narradorId ?? null]
     }, { validators: [this.dateRangeValidator()] });
   }
 
@@ -175,7 +185,7 @@ export class ActivityEditModalComponent implements OnInit {
 
       payload.sistema = formValue.sistema;
       payload.numeroVagas = Number(formValue.numeroVagas);
-      payload.narradorId = this.activity.narradorId ?? null;
+      payload.narradorId = formValue.narradorId ?? null;
       payload.tags = tags;
     }
 
@@ -273,6 +283,27 @@ export class ActivityEditModalComponent implements OnInit {
       error: (error) => {
         console.error('Erro ao carregar tags:', error);
         this.snackBar.open('Não foi possível carregar as tags.', 'Fechar', {
+          duration: 3500,
+          panelClass: ['snackbar-error']
+        });
+      }
+    });
+  }
+
+  loadNarrators(): void {
+    this.loadingNarrators = true;
+    this.userService.getNarrators().pipe(
+      finalize(() => {
+        this.loadingNarrators = false;
+      })
+    ).subscribe({
+      next: (response) => {
+        this.narrators = response.data ?? [];
+      },
+      error: (error) => {
+        console.error('Erro ao carregar narradores:', error);
+        this.narrators = [];
+        this.snackBar.open('Não foi possível carregar a lista de narradores.', 'Fechar', {
           duration: 3500,
           panelClass: ['snackbar-error']
         });

@@ -4,7 +4,9 @@ import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/materia
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { ActivityTypeLabelPipe } from '../../pipes/activity-type-label.pipe';
 import { ActivityModel } from '../../models/activity.model';
 import { ActivityType } from '../../models/activity-type.enum';
 import { EventModelV2 } from '../../models/event.model';
@@ -22,7 +24,9 @@ import { UserService } from '../../services/user/user.service';
     MatButtonModule,
     MatChipsModule,
     MatIconModule,
-    MatSnackBarModule
+    MatProgressSpinnerModule,
+    MatSnackBarModule,
+    ActivityTypeLabelPipe
   ],
   templateUrl: './event-modal.component.html',
   styleUrls: ['./event-modal.component.scss']

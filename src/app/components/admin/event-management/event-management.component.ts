@@ -22,11 +22,14 @@ import { MatTooltipModule } from '@angular/material/tooltip';
 import { ActivityModel, CreateActivityPayload } from '../../../models/activity.model';
 import { ActivityType } from '../../../models/activity-type.enum';
 import { EventModelV2 } from '../../../models/event.model';
+import { NarratorOption } from '../../../models/narrator-option.model';
 import { TagModel } from '../../../models/tag.model';
+import { ActivityTypeLabelPipe } from '../../../pipes/activity-type-label.pipe';
 import { ActivityApiService } from '../../../services/event/activity-api.service';
 import { EventApiService } from '../../../services/event/event-api.service';
 import { StateService } from '../../../services/state/state.service';
 import { TagApiService } from '../../../services/tag/tag-api.service';
+import { UserService } from '../../../services/user/user.service';
 import { EventFormModalComponent, EventFormModalResult } from './event-form-modal/event-form-modal.component';
 
 @Component({
@@ -50,7 +53,8 @@ import { EventFormModalComponent, EventFormModalResult } from './event-form-moda
     MatDatepickerModule,
     MatNativeDateModule,
     MatAutocompleteModule,
-    MatChipsModule
+    MatChipsModule,
+    ActivityTypeLabelPipe
   ],
   templateUrl: './event-management.component.html',
   styleUrls: ['./event-management.component.scss']
@@ -90,6 +94,9 @@ export class EventManagementComponent implements OnInit, OnDestroy {
   selectedTags: TagModel[] = [];
   loadingTags = false;
 
+  narrators: NarratorOption[] = [];
+  loadingNarrators = false;
+
   activityForm!: FormGroup;
 
   private readonly subscriptions = new Subscription();
@@ -99,6 +106,7 @@ export class EventManagementComponent implements OnInit, OnDestroy {
     private readonly eventApiService: EventApiService,
     private readonly activityApiService: ActivityApiService,
     private readonly tagApiService: TagApiService,
+    private readonly userService: UserService,
     private readonly stateService: StateService,
     private readonly snackBar: MatSnackBar,
     private readonly dialog: MatDialog
@@ -108,6 +116,7 @@ export class EventManagementComponent implements OnInit, OnDestroy {
     this.initForms();
     this.loadEvents();
     this.loadTags();
+    this.loadNarrators();
   }
 
   ngOnDestroy(): void {
@@ -226,6 +235,24 @@ export class EventManagementComponent implements OnInit, OnDestroy {
       },
       error: () => {
         this.showError('Não foi possível carregar as tags.');
+      }
+    });
+  }
+
+  loadNarrators(): void {
+    this.loadingNarrators = true;
+
+    this.userService.getNarrators().pipe(
+      finalize(() => {
+        this.loadingNarrators = false;
+      })
+    ).subscribe({
+      next: (response) => {
+        this.narrators = response.data ?? [];
+      },
+      error: () => {
+        this.narrators = [];
+        this.showError('Não foi possível carregar a lista de narradores.');
       }
     });
   }
@@ -486,7 +513,7 @@ export class EventManagementComponent implements OnInit, OnDestroy {
       const narratorId = this.normalizeIdentifier(value.narradorId) ?? this.resolveLoggedUserId();
 
       if (!value.sistema || !value.numeroVagas || value.numeroVagas <= 0 || !narratorId || tags.length === 0) {
-        this.showError('Para RPG_MESA informe sistema, vagas, ID do narrador e tags.');
+        this.showError('Para RPG_MESA informe sistema, vagas, narrador e tags.');
         return null;
       }
 

@@ -5,6 +5,7 @@ import { MatCardModule }          from '@angular/material/card';
 import { MatFormFieldModule }     from '@angular/material/form-field';
 import { MatInputModule }         from '@angular/material/input';
 import { MatButtonModule }        from '@angular/material/button';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { RouterModule, Router } from '@angular/router';
 import { LoginService } from '../../services/login/login.service';
 import { LoginModel } from '../../models/login';
@@ -13,6 +14,7 @@ import { HttpClientModule } from '@angular/common/http';
 import { UserService } from '../../services/user/user.service';
 import { CookieConsentService } from '../../services/cookie-consent/cookie-consent.service';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { finalize } from 'rxjs';
 
 @Component({
   selector: 'app-login',
@@ -29,6 +31,7 @@ import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
     MatFormFieldModule,
     MatInputModule,
     MatButtonModule,
+    MatProgressSpinnerModule,
     RouterModule,
     MatSnackBarModule
   ],
@@ -40,6 +43,8 @@ export class LoginComponent {
     email: ['', [Validators.required, Validators.email]],
     password: ['', [Validators.required]]
   });
+
+  isLoading = false;
 
   constructor(
     private fb: FormBuilder,
@@ -72,6 +77,8 @@ export class LoginComponent {
   login() {
     if (this.loginForm.valid) {
       const credentials = this.loginForm.value;
+      this.isLoading = true;
+
       this.loginService.login(credentials as LoginModel).subscribe({
         next: (response) => {
           // Primeiro salvar o token
@@ -80,7 +87,11 @@ export class LoginComponent {
           this.stateService.isLoggedIn = true;
 
           // Depois buscar dados completos do usuário
-          this.userService.getUserProfile().subscribe({
+          this.userService.getUserProfile().pipe(
+            finalize(() => {
+              this.isLoading = false;
+            })
+          ).subscribe({
             next: (userResponse) => {
               console.log('Resposta completa do getUserProfile:', userResponse);
               if (userResponse.data) {
@@ -139,6 +150,7 @@ export class LoginComponent {
         },
         error: (error) => {
           console.error('Login failed:', error);
+          this.isLoading = false;
           this.snackBar.open(
             'Erro ao fazer login. Verifique suas credenciais.',
             'Fechar',

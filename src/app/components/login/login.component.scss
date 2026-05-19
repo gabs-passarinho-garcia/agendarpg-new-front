@@ -37,3 +37,20 @@ form button[type="submit"] {
     flex: 1;
   }
 }
+
+.login-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+
+  mat-spinner {
+    display: inline-block;
+    margin-right: 4px;
+  }
+
+  span {
+    flex: 1;
+    text-align: center;
+  }
+}

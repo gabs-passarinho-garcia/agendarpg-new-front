@@ -16,7 +16,7 @@
           <mat-label>Tipo</mat-label>
           <mat-select formControlName="tipo">
             @for (type of activityTypes; track type) {
-              <mat-option [value]="type">{{ type }}</mat-option>
+              <mat-option [value]="type">{{ type | activityTypeLabel }}</mat-option>
             }
           </mat-select>
         </mat-form-field>
@@ -148,6 +148,22 @@
               </mat-chip-set>
             </div>
           }
+
+          <mat-form-field appearance="outline" >
+            <mat-label>Narrador</mat-label>
+            <mat-select formControlName="narradorId" [disabled]="loadingNarrators">
+              @if (loadingNarrators) {
+                <mat-option disabled>
+                  Carregando narradores...
+                </mat-option>
+              }
+              @for (narrator of narrators; track narrator.id) {
+                <mat-option [value]="narrator.id">
+                  {{ narrator.nome }}
+                </mat-option>
+              }
+            </mat-select>
+          </mat-form-field>
         }
 
         @if (isWorkshopActivity) {

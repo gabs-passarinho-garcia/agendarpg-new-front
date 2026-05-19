@@ -52,7 +52,7 @@ mat-card-title {
 
 .sections-grid {
   display: grid;
-  grid-template-columns: 1fr;
+  grid-template-columns: minmax(0, 1fr);
   gap: 28px;
 }
 
@@ -60,6 +60,7 @@ mat-card-title {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  min-width: 0;
 }
 
 .section-header {
@@ -151,16 +152,28 @@ mat-card-title {
   display: flex;
   flex-direction: column;
   gap: 8px;
+  min-width: 0;
 }
 
 .table-container {
-  overflow: hidden;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow-x: auto;
+  overflow-y: hidden;
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 12px;
 }
 
 .management-table {
   width: 100%;
+  min-width: 760px;
+  table-layout: fixed;
+
+  th,
+  td {
+    vertical-align: middle;
+  }
 
   th.mat-header-cell {
     font-weight: 600;
@@ -175,13 +188,32 @@ mat-card-title {
   tr.selected-row {
     background: rgba(25, 118, 210, 0.08);
   }
+
+  .mat-column-acoes {
+    width: 140px;
+    min-width: 140px;
+    max-width: 140px;
+    text-align: center;
+    white-space: nowrap;
+    height: 70px;
+  }
 }
 
 .acoes-cell {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 4px;
   white-space: nowrap;
+}
+
+.management-table .mat-column-nome,
+.management-table .mat-column-local {
+  min-width: 180px;
+}
+
+.management-table .mat-column-periodo {
+  min-width: 220px;
 }
 
 .tipo-badge {
@@ -234,5 +266,14 @@ mat-paginator {
 
   .form-grid {
     grid-template-columns: 1fr;
+  }
+
+  .table-container {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .management-table {
+    min-width: 680px;
   }
 }

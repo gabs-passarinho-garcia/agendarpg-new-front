@@ -46,7 +46,7 @@
           <mat-form-field appearance="outline">
             <mat-label>Tipo</mat-label>
             <mat-select formControlName="tipo">
-              <mat-option *ngFor="let type of activityTypes" [value]="type">{{ type }}</mat-option>
+              <mat-option *ngFor="let type of activityTypes" [value]="type">{{ type | activityTypeLabel }}</mat-option>
             </mat-select>
           </mat-form-field>
 

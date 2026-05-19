@@ -148,7 +148,7 @@
                       <mat-label>Tipo</mat-label>
                       <mat-select formControlName="tipo">
                         @for (type of activityTypes; track type) {
-                          <mat-option [value]="type">{{ type }}</mat-option>
+                          <mat-option [value]="type">{{ type | activityTypeLabel }}</mat-option>
                         }
                       </mat-select>
                     </mat-form-field>
@@ -226,8 +226,16 @@
                       </mat-form-field>
 
                       <mat-form-field appearance="outline">
-                        <mat-label>ID do narrador</mat-label>
-                        <input matInput formControlName="narradorId" placeholder="ID numérico ou UUID">
+                        <mat-label>Narrador</mat-label>
+                        <mat-select formControlName="narradorId" [disabled]="loadingNarrators">
+                          @if (loadingNarrators) {
+                            <mat-option disabled>Carregando narradores...</mat-option>
+                          }
+                          <mat-option [value]="null">Selecione um narrador</mat-option>
+                          @for (narrator of narrators; track narrator.id) {
+                            <mat-option [value]="narrator.id">{{ narrator.nome }}</mat-option>
+                          }
+                        </mat-select>
                       </mat-form-field>
 
                       <mat-form-field appearance="outline" class="full-row">
@@ -308,7 +316,7 @@
                             class="tipo-badge"
                             [class.tipo-rpg]="activity.tipo === activityType.RPG_MESA"
                             [class.tipo-workshop]="activity.tipo === activityType.WORKSHOP">
-                            {{ activity.tipo }}
+                            {{ activity.tipo | activityTypeLabel }}
                           </span>
                         </td>
                       </ng-container>
