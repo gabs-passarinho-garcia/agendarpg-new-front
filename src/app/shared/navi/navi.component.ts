@@ -85,7 +85,5 @@ export class NaviComponent {
   resetCookieConsent(): void {
     this.cookieConsentService.resetConsent();
     this.onLinkClick();
-    // Recarrega a página para mostrar o banner novamente
-    window.location.reload();
   }
 }

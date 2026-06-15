@@ -9,7 +9,7 @@ export class CookieConsentService {
   private readonly CONSENT_COOKIE = 'cookie_consent';
   private readonly CONSENT_DATE_COOKIE = 'cookie_consent_date';
   
-  private consentSubject = new BehaviorSubject<boolean | null>(null);
+  private consentSubject = new BehaviorSubject<boolean | null | undefined>(undefined);
   public consent$ = this.consentSubject.asObservable();
 
   constructor(@Inject(PLATFORM_ID) private platformId: Object) {
@@ -17,6 +17,10 @@ export class CookieConsentService {
   }
 
   private initializeConsent(): void {
+    if (!isPlatformBrowser(this.platformId)) {
+      return;
+    }
+
     const consent = this.getConsent();
     this.consentSubject.next(consent);
   }
@@ -68,6 +72,10 @@ export class CookieConsentService {
    * Verifica se o banner deve ser mostrado
    */
   shouldShowBanner(): boolean {
+    if (!isPlatformBrowser(this.platformId)) {
+      return false;
+    }
+
     return this.getConsent() === null;
   }
 
@@ -81,7 +89,6 @@ export class CookieConsentService {
 
     this.deleteBasicCookie(this.CONSENT_COOKIE);
     this.deleteBasicCookie(this.CONSENT_DATE_COOKIE);
-    this.clearNonEssentialCookies();
     this.consentSubject.next(null);
   }
 

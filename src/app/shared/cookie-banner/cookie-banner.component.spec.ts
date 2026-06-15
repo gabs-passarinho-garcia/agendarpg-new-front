@@ -1,5 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { NoopAnimationsModule } from '@angular/platform-browser/animations';
+import { BehaviorSubject } from 'rxjs';
 import { CookieBannerComponent } from './cookie-banner.component';
 import { CookieConsentService } from '../../services/cookie-consent/cookie-consent.service';
 import { PLATFORM_ID } from '@angular/core';
@@ -8,12 +9,16 @@ describe('CookieBannerComponent', () => {
   let component: CookieBannerComponent;
   let fixture: ComponentFixture<CookieBannerComponent>;
   let cookieConsentService: jasmine.SpyObj<CookieConsentService>;
+  let consentSubject: BehaviorSubject<boolean | null | undefined>;
 
   beforeEach(async () => {
+    consentSubject = new BehaviorSubject<boolean | null | undefined>(undefined);
     const spy = jasmine.createSpyObj('CookieConsentService', [
-      'shouldShowBanner',
       'setConsent'
     ]);
+    Object.defineProperty(spy, 'consent$', {
+      value: consentSubject.asObservable()
+    });
 
     await TestBed.configureTestingModule({
       imports: [
@@ -36,14 +41,29 @@ describe('CookieBannerComponent', () => {
   });
 
   it('should show banner when consent is needed', () => {
-    cookieConsentService.shouldShowBanner.and.returnValue(true);
+    consentSubject.next(null);
     component.ngOnInit();
     expect(component.showBanner).toBe(true);
   });
 
   it('should not show banner when consent is already given', () => {
-    cookieConsentService.shouldShowBanner.and.returnValue(false);
+    consentSubject.next(true);
     component.ngOnInit();
+    expect(component.showBanner).toBe(false);
+  });
+
+  it('should show banner again when consent is reset', () => {
+    consentSubject.next(true);
+    component.ngOnInit();
+
+    consentSubject.next(null);
+
+    expect(component.showBanner).toBe(true);
+  });
+
+  it('should keep banner hidden until consent is resolved', () => {
+    component.ngOnInit();
+
     expect(component.showBanner).toBe(false);
   });
 

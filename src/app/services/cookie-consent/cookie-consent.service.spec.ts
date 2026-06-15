@@ -54,4 +54,27 @@ describe('CookieConsentService', () => {
     service.setConsent(false);
     expect(service.canUseCookies()).toBe(false);
   });
+
+  it('should keep functional cookies when only resetting consent', () => {
+    document.cookie = 'auth_token=test-token; path=/;';
+
+    service.resetConsent();
+
+    expect(document.cookie).toContain('auth_token=test-token');
+
+    document.cookie = 'auth_token=; expires=Thu, 01 Jan 1970 00:00:00 UTC; path=/;';
+  });
+
+  it('should not show banner during server-side rendering', () => {
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [
+        { provide: PLATFORM_ID, useValue: 'server' }
+      ]
+    });
+
+    const serverService = TestBed.inject(CookieConsentService);
+
+    expect(serverService.shouldShowBanner()).toBe(false);
+  });
 });
