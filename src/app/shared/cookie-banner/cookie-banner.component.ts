@@ -26,8 +26,9 @@ export class CookieBannerComponent implements OnInit, OnDestroy {
   constructor(private cookieConsentService: CookieConsentService) {}
 
   ngOnInit(): void {
-    // Verifica se deve mostrar o banner
-    this.showBanner = this.cookieConsentService.shouldShowBanner();
+    this.subscription = this.cookieConsentService.consent$.subscribe(consent => {
+      this.showBanner = consent === null;
+    });
   }
 
   ngOnDestroy(): void {
