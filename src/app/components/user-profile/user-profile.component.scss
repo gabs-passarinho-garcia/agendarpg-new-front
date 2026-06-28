@@ -245,7 +245,34 @@ mat-card-actions {
     mat-icon {
       margin-right: 0.5rem;
     }
-  }  .edit-actions {
+  }
+
+  .security-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .change-email-btn {
+    color: #00897b;
+    border-color: #00897b;
+    background: rgba(0, 137, 123, 0.05);
+    font-weight: 500;
+
+    &:hover:not(:disabled) {
+      background-color: rgba(0, 137, 123, 0.1);
+      border-color: #00695c;
+      color: #00695c;
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(0, 137, 123, 0.2);
+    }
+
+    mat-icon {
+      margin-right: 0.5rem;
+    }
+  }
+
+  .edit-actions {
     display: flex;
     gap: 0.5rem;
     margin-left: auto;
@@ -255,9 +282,16 @@ mat-card-actions {
     flex-direction: column;
     gap: 0.5rem;
 
+    .security-actions,
     .change-password-btn,
+    .change-email-btn,
     .edit-actions button {
       width: 100%;
+    }
+
+    .security-actions {
+      flex-direction: column;
+      align-items: stretch;
     }
 
     .edit-actions {

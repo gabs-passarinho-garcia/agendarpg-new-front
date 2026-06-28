@@ -163,13 +163,21 @@
 
     <mat-card-actions align="end">
       <!-- Botão de trocar senha sempre visível -->
-      <button mat-stroked-button color="accent" (click)="openChangePasswordModal()"
-              [disabled]="loading"
-              class="change-password-btn"
-              *ngIf="!isEditing">
-        <mat-icon>lock</mat-icon>
-        Alterar Senha
-      </button>
+      <div class="security-actions" *ngIf="!isEditing">
+        <button mat-stroked-button color="accent" (click)="openChangePasswordModal()"
+                [disabled]="loading"
+                class="change-password-btn">
+          <mat-icon>lock</mat-icon>
+          Alterar Senha
+        </button>
+
+        <button mat-stroked-button (click)="openChangeEmailModal()"
+                [disabled]="loading"
+                class="change-email-btn">
+          <mat-icon>alternate_email</mat-icon>
+          Alterar E-mail
+        </button>
+      </div>
 
       <!-- Botões de edição -->
       <div *ngIf="isEditing" class="edit-actions">

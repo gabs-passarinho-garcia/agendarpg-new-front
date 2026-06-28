@@ -110,6 +110,39 @@ export class UserService {
     );
   }
 
+  requestChangeEmailCode(): Observable<ResponseModel<string>> {
+    const token = this.stateService.token;
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.post<ResponseModel<string>>(
+      `${this.API_URL}/change-email/request-code`,
+      {},
+      { headers }
+    );
+  }
+
+  validateChangeEmailCode(code: string): Observable<ResponseModel<string>> {
+    const token = this.stateService.token;
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.post<ResponseModel<string>>(
+      `${this.API_URL}/change-email/validate-code`,
+      { code },
+      { headers }
+    );
+  }
+
+  confirmChangeEmail(payload: {
+    novoEmail: string;
+    tokenVerificacao: string;
+  }): Observable<ResponseModel<void>> {
+    const token = this.stateService.token;
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.put<ResponseModel<void>>(
+      `${this.API_URL}/change-email/confirm`,
+      payload,
+      { headers }
+    );
+  }
+
   resendActivationEmail(email: string): Observable<ResponseModel<void>> {
     return this.http.post<ResponseModel<void>>(
       `${this.API_EMAIL_VERIFICATION_URL}/resend-verification`,

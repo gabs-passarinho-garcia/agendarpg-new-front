@@ -15,6 +15,7 @@ import { UserModel } from '../../models/user';
 import { Router } from '@angular/router';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ChangePasswordModalComponent } from '../../shared/change-password-modal/change-password-modal.component';
+import { ChangeEmailModalComponent, ChangeEmailModalResult } from '../../shared/change-email-modal/change-email-modal.component';
 import { PhoneMask } from '../../utils/phone-mask';
 
 @Component({
@@ -288,6 +289,39 @@ export class UserProfileComponent implements OnInit {
       if (result === true) {
         // Senha alterada com sucesso
         console.log('Senha alterada com sucesso');
+      }
+    });
+  }
+
+  openChangeEmailModal(): void {
+    const dialogRef = this.dialog.open(ChangeEmailModalComponent, {
+      width: '500px',
+      maxWidth: '90vw',
+      disableClose: false,
+      autoFocus: true,
+      panelClass: 'change-email-dialog'
+    });
+
+    dialogRef.afterClosed().subscribe((result: ChangeEmailModalResult | undefined) => {
+      if (result?.success && result.newEmail) {
+        this.profileForm.patchValue({ email: result.newEmail });
+
+        const currentUserData = this.stateService.userData;
+        if (currentUserData) {
+          this.stateService.userData = {
+            ...currentUserData,
+            email: result.newEmail
+          };
+        }
+
+        this.snackBar.open(
+          'E-mail atualizado com sucesso!',
+          'Fechar',
+          {
+            duration: 3000,
+            panelClass: ['snackbar-success']
+          }
+        );
       }
     });
   }
