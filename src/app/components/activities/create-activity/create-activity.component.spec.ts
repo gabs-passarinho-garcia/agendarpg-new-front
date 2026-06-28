@@ -123,9 +123,8 @@ describe('CreateActivityComponent', () => {
       tipo: 'RPG_MESA',
       nome: 'Mesa Teste',
       descricao: 'Descricao valida de teste',
-      inicioData: new Date('2026-12-01T00:00:00'),
+      dataAtividade: new Date('2026-12-01T00:00:00'),
       inicioHora: '10:00',
-      fimData: new Date('2026-12-01T00:00:00'),
       fimHora: '12:00',
       localComplemento: 'Sala 1',
       sistema: 'D&D 5e',
@@ -171,9 +170,8 @@ describe('CreateActivityComponent', () => {
       tipo: 'RPG_MESA',
       nome: 'Mesa ISO',
       descricao: 'Descricao de serializacao',
-      inicioData: new Date('2026-12-01T00:00:00'),
+      dataAtividade: new Date('2026-12-01T00:00:00'),
       inicioHora: '10:00',
-      fimData: new Date('2026-12-01T00:00:00'),
       fimHora: '12:00',
       localComplemento: 'Sala A',
       sistema: 'D&D 5e',
@@ -221,9 +219,8 @@ describe('CreateActivityComponent', () => {
       tipo: 'RPG_MESA',
       nome: 'Mesa Invalida',
       descricao: 'Descricao valida de teste',
-      inicioData: new Date('2026-12-01T00:00:00'),
+      dataAtividade: new Date('2026-12-01T00:00:00'),
       inicioHora: '12:00',
-      fimData: new Date('2026-12-01T00:00:00'),
       fimHora: '12:00',
       localComplemento: 'Sala 1',
       sistema: 'D&D 5e',
@@ -295,9 +292,8 @@ describe('CreateActivityComponent', () => {
       tipo: 'RPG_MESA',
       nome: 'Mesa Sem Tag',
       descricao: 'Descricao valida de teste',
-      inicioData: new Date('2026-12-01T00:00:00'),
+      dataAtividade: new Date('2026-12-01T00:00:00'),
       inicioHora: '10:00',
-      fimData: new Date('2026-12-01T00:00:00'),
       fimHora: '12:00',
       localComplemento: 'Sala 1',
       sistema: 'D&D 5e',
@@ -346,9 +342,8 @@ describe('CreateActivityComponent', () => {
       tipo: 'RPG_MESA',
       nome: 'Mesa UUID',
       descricao: 'Descricao valida de teste',
-      inicioData: new Date('2026-12-01T00:00:00'),
+      dataAtividade: new Date('2026-12-01T00:00:00'),
       inicioHora: '10:00',
-      fimData: new Date('2026-12-01T00:00:00'),
       fimHora: '12:00',
       localComplemento: 'Sala 1',
       sistema: 'Savage Worlds',
@@ -361,5 +356,67 @@ describe('CreateActivityComponent', () => {
     expect(createSpy).toHaveBeenCalled();
     const payload = createSpy.calls.mostRecent().args[1];
     expect(payload.narradorId).toBe('4f8aef70-2cb1-4fc6-a6a8-2b7a604f7ed5');
+  });
+
+  it('deve permitir horarios de inicio e fim em evento de varios dias respeitando o intervalo do evento', () => {
+    component.events = [
+      {
+        id: 2,
+        nome: 'Evento Longo',
+        local: 'Centro',
+        inicio: '2026-07-04T10:00:00',
+        fim: '2026-07-05T18:00:00'
+      }
+    ];
+
+    component.hasEligibleEvents = true;
+    component.selectEvent(2);
+
+    expect(component.availableStartHours[0]).toBe('10:00');
+    expect(component.availableStartHours).toContain('17:00');
+    expect(component.availableStartHours).not.toContain('18:00');
+
+    expect(component.availableEndHours[0]).toBe('11:00');
+    expect(component.availableEndHours).toContain('18:00');
+    expect(component.availableEndHours).not.toContain('10:00');
+
+    component.activityForm.patchValue({
+      dataAtividade: new Date('2026-07-05T00:00:00'),
+      inicioHora: '10:00',
+      fimHora: '18:00'
+    });
+
+    const activityApiService = TestBed.inject(ActivityApiService);
+    const createSpy = spyOn(activityApiService, 'create').and.returnValue(of({
+      statusCode: 200,
+      data: {
+        id: 15,
+        eventoId: 2,
+        tipo: 'RPG_MESA' as any,
+        nome: 'Mesa Longa',
+        descricao: 'Descricao',
+        inicio: '2026-07-05T10:00:00',
+        fim: '2026-07-05T18:00:00',
+        localComplemento: 'Sala'
+      }
+    }));
+
+    component.activityForm.patchValue({
+      tipo: 'RPG_MESA',
+      nome: 'Mesa Longa',
+      descricao: 'Descricao valida de teste',
+      localComplemento: 'Sala 1',
+      sistema: 'D&D 5e',
+      numeroVagas: 4,
+      tagsText: 'fantasia'
+    });
+    component.selectedTags = [{ id: 1, nome: 'fantasia' }];
+
+    component.submit();
+
+    expect(createSpy).toHaveBeenCalled();
+    const payload = createSpy.calls.mostRecent().args[1];
+    expect(payload.inicio).toBe('2026-07-05T10:00:00');
+    expect(payload.fim).toBe('2026-07-05T18:00:00');
   });
 });

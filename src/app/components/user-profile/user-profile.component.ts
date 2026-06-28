@@ -16,6 +16,7 @@ import { Router } from '@angular/router';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { ChangePasswordModalComponent } from '../../shared/change-password-modal/change-password-modal.component';
 import { ChangeEmailModalComponent, ChangeEmailModalResult } from '../../shared/change-email-modal/change-email-modal.component';
+import { ReloginRequiredModalComponent } from '../../shared/relogin-required-modal/relogin-required-modal.component';
 import { PhoneMask } from '../../utils/phone-mask';
 
 @Component({
@@ -86,7 +87,7 @@ export class UserProfileComponent implements OnInit {
       id: [''],
       nomeCompleto: [{ value: '', disabled: true }],
       apelido: ['', [Validators.required, Validators.minLength(2)]],
-      email: ['', [Validators.required, Validators.email]],
+      email: [{ value: '', disabled: true }, [Validators.required, Validators.email]],
       telefone: ['', [this.phoneValidator]],
       dataDeNascimento: [{ value: '', disabled: true }],
       tipo: [{ value: '', disabled: true }],
@@ -221,7 +222,7 @@ export class UserProfileComponent implements OnInit {
   }
 
   private updateStateServiceData(): void {
-    const formData = this.profileForm.value;
+    const formData = this.profileForm.getRawValue();
     const currentUserData = this.stateService.userData;
     if (currentUserData) {
       this.stateService.userData = {
@@ -314,14 +315,19 @@ export class UserProfileComponent implements OnInit {
           };
         }
 
-        this.snackBar.open(
-          'E-mail atualizado com sucesso!',
-          'Fechar',
-          {
-            duration: 3000,
-            panelClass: ['snackbar-success']
+        const reloginDialogRef = this.dialog.open(ReloginRequiredModalComponent, {
+          width: '450px',
+          maxWidth: '90vw',
+          disableClose: true,
+          autoFocus: true
+        });
+
+        reloginDialogRef.afterClosed().subscribe((confirmRelogin: boolean) => {
+          if (confirmRelogin) {
+            this.stateService.logout();
+            this.router.navigate(['/login']);
           }
-        );
+        });
       }
     });
   }

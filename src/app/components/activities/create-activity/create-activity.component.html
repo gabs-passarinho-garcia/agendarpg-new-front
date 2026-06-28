@@ -64,42 +64,34 @@
             <mat-error *ngIf="activityForm.get('descricao')?.hasError('minlength')">Descrição deve ter pelo menos 5 caracteres</mat-error>
           </mat-form-field>
 
-          <mat-form-field appearance="outline">
-            <mat-label>Data de início</mat-label>
-            <input matInput [matDatepicker]="inicioPicker" formControlName="inicioData" title="Data de início">
-            <mat-datepicker-toggle matSuffix [for]="inicioPicker"></mat-datepicker-toggle>
-            <mat-datepicker #inicioPicker></mat-datepicker>
-            <mat-error *ngIf="activityForm.get('inicioData')?.hasError('required')">Data de início é obrigatória</mat-error>
+          <mat-form-field appearance="outline" class="full-row">
+            <mat-label>Data da atividade</mat-label>
+            <input matInput [matDatepicker]="atividadePicker" [matDatepickerFilter]="isDateAllowed" [min]="minAllowedDate" [max]="maxAllowedDate" formControlName="dataAtividade" title="Data da atividade">
+            <mat-datepicker-toggle matSuffix [for]="atividadePicker"></mat-datepicker-toggle>
+            <mat-datepicker #atividadePicker></mat-datepicker>
+            <mat-error *ngIf="activityForm.get('dataAtividade')?.hasError('required')">Data da atividade é obrigatória</mat-error>
           </mat-form-field>
 
           <mat-form-field appearance="outline">
             <mat-label>Hora de início</mat-label>
             <mat-select formControlName="inicioHora">
               <mat-option [value]="null">Selecione um horário</mat-option>
-              <mat-option *ngFor="let hour of availableHours" [value]="hour">{{ hour }}</mat-option>
+              <mat-option *ngFor="let hour of availableStartHours" [value]="hour">{{ hour }}</mat-option>
             </mat-select>
             <mat-error *ngIf="activityForm.get('inicioHora')?.hasError('required')">Hora de início é obrigatória</mat-error>
-          </mat-form-field>
-
-          <mat-form-field appearance="outline">
-            <mat-label>Data de fim</mat-label>
-            <input matInput [matDatepicker]="fimPicker" formControlName="fimData" title="Data de fim">
-            <mat-datepicker-toggle matSuffix [for]="fimPicker"></mat-datepicker-toggle>
-            <mat-datepicker #fimPicker></mat-datepicker>
-            <mat-error *ngIf="activityForm.get('fimData')?.hasError('required')">Data de fim é obrigatória</mat-error>
           </mat-form-field>
 
           <mat-form-field appearance="outline">
             <mat-label>Hora de fim</mat-label>
             <mat-select formControlName="fimHora">
               <mat-option [value]="null">Selecione um horário</mat-option>
-              <mat-option *ngFor="let hour of availableHours" [value]="hour">{{ hour }}</mat-option>
+              <mat-option *ngFor="let hour of availableEndHours" [value]="hour">{{ hour }}</mat-option>
             </mat-select>
             <mat-error *ngIf="activityForm.get('fimHora')?.hasError('required')">Hora de fim é obrigatória</mat-error>
           </mat-form-field>
 
-          <div class="date-range-error full-row" *ngIf="activityForm.hasError('invalidDateRange') && (activityForm.get('inicioData')?.touched || activityForm.get('fimData')?.touched || activityForm.get('inicioHora')?.touched || activityForm.get('fimHora')?.touched)">
-            A data/hora de fim deve ser maior que a data/hora de início.
+          <div class="date-range-error full-row" *ngIf="activityForm.hasError('invalidDateRange') && (activityForm.get('dataAtividade')?.touched || activityForm.get('inicioHora')?.touched || activityForm.get('fimHora')?.touched)">
+            A atividade deve ter horário final maior que o horário inicial.
           </div>
 
           <mat-form-field appearance="outline" class="full-row">

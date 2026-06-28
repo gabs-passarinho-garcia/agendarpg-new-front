@@ -37,6 +37,7 @@ export class NewEventComponent implements OnInit {
   eventForm!: FormGroup;
   submitting = false;
   readonly availableHours = this.buildAvailableHours();
+  private endDateTimeManuallyEdited = false;
 
   constructor(
     private readonly fb: FormBuilder,
@@ -61,6 +62,14 @@ export class NewEventComponent implements OnInit {
 
     this.eventForm.get('inicioHora')?.valueChanges.subscribe(() => {
       this.suggestEndDateTime();
+    });
+
+    this.eventForm.get('fimData')?.valueChanges.subscribe(() => {
+      this.endDateTimeManuallyEdited = !this.isEndDateTimeEmpty();
+    });
+
+    this.eventForm.get('fimHora')?.valueChanges.subscribe(() => {
+      this.endDateTimeManuallyEdited = !this.isEndDateTimeEmpty();
     });
   }
 
@@ -161,6 +170,10 @@ export class NewEventComponent implements OnInit {
   }
 
   private suggestEndDateTime(): void {
+    if (this.endDateTimeManuallyEdited) {
+      return;
+    }
+
     const inicioData = this.eventForm.get('inicioData')?.value;
     const inicioHora = this.eventForm.get('inicioHora')?.value;
 
@@ -183,6 +196,13 @@ export class NewEventComponent implements OnInit {
       },
       { emitEvent: false }
     );
+  }
+
+  private isEndDateTimeEmpty(): boolean {
+    const fimData = this.eventForm.get('fimData')?.value;
+    const fimHora = this.eventForm.get('fimHora')?.value;
+
+    return !fimData && !fimHora;
   }
 
   private formatToLocalDateTime(date: Date): string {

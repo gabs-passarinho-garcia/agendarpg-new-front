@@ -265,8 +265,18 @@ export class ChangeEmailModalComponent {
         this.resultSuccess = true;
         this.step = 'result';
       },
-      error: () => {
+      error: (error) => {
         this.loading = false;
+
+        if (error?.status === 409) {
+          const errorMessage = error?.error?.message || 'Este e-mail já está em uso por outro usuário. O e-mail não pode ser alterado.';
+          this.snackBar.open(errorMessage, 'Fechar', {
+            duration: 4500,
+            panelClass: ['snackbar-error']
+          });
+          return;
+        }
+
         this.resultSuccess = false;
         this.step = 'result';
       }

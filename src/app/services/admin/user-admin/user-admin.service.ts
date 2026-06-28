@@ -47,6 +47,16 @@ export class UserAdminService {
     );
   }
 
+  validateUserIsCoordinatorOrAdmin(): Observable<ResponseModel<boolean>> {
+    const token = this.stateService.token;
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.post<ResponseModel<boolean>>(
+      `${this.API_URL}/validate-coordinator-admin`,
+      {},
+      { headers }
+    );
+  }
+
   /**
    * Busca usuários com sistema de paginação e filtros opcionais
    * @param searchParams - Parâmetros de busca e paginação

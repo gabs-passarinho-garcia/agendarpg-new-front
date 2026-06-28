@@ -57,6 +57,8 @@ export class CreateActivityComponent implements OnInit {
 
   events: EventModelV2[] = [];
   selectedEvent: EventModelV2 | null = null;
+  minAllowedDate: Date | null = null;
+  maxAllowedDate: Date | null = null;
   availableTags: TagModel[] = [];
   filteredTags: TagModel[] = [];
   selectedTags: TagModel[] = [];
@@ -64,7 +66,8 @@ export class CreateActivityComponent implements OnInit {
 
   readonly activityTypes = [ActivityType.RPG_MESA, ActivityType.WORKSHOP];
   readonly activityType = ActivityType;
-  readonly availableHours = this.buildAvailableHours();
+  availableStartHours: string[] = [];
+  availableEndHours: string[] = [];
 
   activityForm!: FormGroup;
 
@@ -100,10 +103,9 @@ export class CreateActivityComponent implements OnInit {
       tipo: [ActivityType.RPG_MESA, Validators.required],
       nome: ['', [Validators.required, Validators.minLength(3)]],
       descricao: ['', [Validators.required, Validators.minLength(5)]],
-      inicioData: [null, Validators.required],
-      inicioHora: [null, Validators.required],
-      fimData: [null, Validators.required],
-      fimHora: [null, Validators.required],
+      dataAtividade: [{ value: null, disabled: true }, Validators.required],
+      inicioHora: [{ value: null, disabled: true }, Validators.required],
+      fimHora: [{ value: null, disabled: true }, Validators.required],
       localComplemento: ['', [Validators.required, Validators.minLength(2)]],
       sistema: [''],
       numeroVagas: [null],
@@ -150,6 +152,7 @@ export class CreateActivityComponent implements OnInit {
           this.selectEvent(initialEvent.id);
         } else {
           this.selectedEvent = null;
+          this.setScheduleControlsEnabled(false);
         }
       },
       error: (error) => {
@@ -162,7 +165,14 @@ export class CreateActivityComponent implements OnInit {
   selectEvent(eventId: number | null): void {
     const event = this.events.find((item) => item.id === eventId) ?? null;
     this.selectedEvent = event;
-    this.activityForm.patchValue({ eventId });
+    this.setScheduleControlsEnabled(!!event);
+    this.activityForm.patchValue({
+      eventId,
+      dataAtividade: null,
+      inicioHora: null,
+      fimHora: null
+    });
+    this.updateScheduleConstraints(event);
   }
 
   submit(): void {
@@ -186,11 +196,11 @@ export class CreateActivityComponent implements OnInit {
     }
 
     const value = this.activityForm.value;
-    const inicio = this.combineDateAndTime(value.inicioData, value.inicioHora);
-    const fim = this.combineDateAndTime(value.fimData, value.fimHora);
+    const inicio = this.combineDateAndTime(value.dataAtividade, value.inicioHora);
+    const fim = this.combineDateAndTime(value.dataAtividade, value.fimHora);
 
     if (!inicio || !fim) {
-      this.showError('Informe data e hora válidas para início e fim.');
+      this.showError('Informe uma data e horários válidos para início e fim.');
       return;
     }
 
@@ -242,9 +252,8 @@ export class CreateActivityComponent implements OnInit {
       tipo: ActivityType.RPG_MESA,
       nome: '',
       descricao: '',
-      inicioData: null,
+      dataAtividade: null,
       inicioHora: null,
-      fimData: null,
       fimHora: null,
       localComplemento: '',
       sistema: '',
@@ -267,11 +276,11 @@ export class CreateActivityComponent implements OnInit {
 
   private buildPayload(): CreateActivityPayload | null {
     const value = this.activityForm.value;
-    const inicio = this.combineDateAndTime(value.inicioData, value.inicioHora);
-    const fim = this.combineDateAndTime(value.fimData, value.fimHora);
+    const inicio = this.combineDateAndTime(value.dataAtividade, value.inicioHora);
+    const fim = this.combineDateAndTime(value.dataAtividade, value.fimHora);
 
     if (!inicio || !fim) {
-      this.showError('Informe data e hora válidas para início e fim.');
+      this.showError('Informe uma data e horários válidos para início e fim.');
       return null;
     }
 
@@ -330,23 +339,26 @@ export class CreateActivityComponent implements OnInit {
 
   private dateRangeValidator(): ValidatorFn {
     return (group): ValidationErrors | null => {
-      const inicioData = group.get('inicioData')?.value;
+      const dataAtividade = group.get('dataAtividade')?.value;
       const inicioHora = group.get('inicioHora')?.value;
-      const fimData = group.get('fimData')?.value;
       const fimHora = group.get('fimHora')?.value;
 
-      if (!inicioData || !inicioHora || !fimData || !fimHora) {
+      if (!dataAtividade || !inicioHora || !fimHora) {
         return null;
       }
 
-      const inicio = this.combineDateAndTime(inicioData, inicioHora);
-      const fim = this.combineDateAndTime(fimData, fimHora);
+      const inicio = this.combineDateAndTime(dataAtividade, inicioHora);
+      const fim = this.combineDateAndTime(dataAtividade, fimHora);
 
       if (!inicio || !fim) {
         return null;
       }
 
-      return new Date(fim) > new Date(inicio) ? null : { invalidDateRange: true };
+      if (new Date(fim) <= new Date(inicio)) {
+        return { invalidDateRange: true };
+      }
+
+      return this.isInsideEventWindow(inicio, fim) ? null : { invalidDateRange: true };
     };
   }
 
@@ -385,16 +397,90 @@ export class CreateActivityComponent implements OnInit {
     return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:00`;
   }
 
-  private buildAvailableHours(): string[] {
-    const hours: string[] = [];
-    for (let hour = 0; hour < 24; hour += 1) {
-      for (const minute of [0, 30]) {
-        const hh = `${hour}`.padStart(2, '0');
-        const mm = `${minute}`.padStart(2, '0');
-        hours.push(`${hh}:${mm}`);
+  private updateScheduleConstraints(event: EventModelV2 | null): void {
+    if (!event) {
+      this.minAllowedDate = null;
+      this.maxAllowedDate = null;
+      this.availableStartHours = [];
+      this.availableEndHours = [];
+      return;
+    }
+
+    const eventStart = new Date(event.inicio);
+    const eventEnd = new Date(event.fim);
+
+    this.minAllowedDate = this.startOfDay(eventStart);
+    this.maxAllowedDate = this.startOfDay(eventEnd);
+    this.availableStartHours = this.buildAvailableStartHours(eventStart, eventEnd);
+    this.availableEndHours = this.buildAvailableEndHours(eventStart, eventEnd);
+  }
+
+  private buildAvailableStartHours(eventStart: Date, eventEnd: Date): string[] {
+    const start = this.anchorTime(eventStart);
+    const end = this.anchorTime(eventEnd);
+    end.setHours(end.getHours() - 1, end.getMinutes(), 0, 0);
+
+    return this.buildHourlySlots(start, end);
+  }
+
+  private buildAvailableEndHours(eventStart: Date, eventEnd: Date): string[] {
+    const start = this.anchorTime(eventStart);
+    start.setHours(start.getHours() + 1, start.getMinutes(), 0, 0);
+    const end = this.anchorTime(eventEnd);
+
+    return this.buildHourlySlots(start, end);
+  }
+
+  private buildHourlySlots(start: Date, end: Date): string[] {
+    if (start.getTime() > end.getTime()) {
+      return [];
+    }
+
+    const hours = new Set<string>();
+    const cursor = new Date(start.getTime());
+
+    while (cursor.getTime() <= end.getTime()) {
+      const hh = `${cursor.getHours()}`.padStart(2, '0');
+      const mm = `${cursor.getMinutes()}`.padStart(2, '0');
+      hours.add(`${hh}:${mm}`);
+      cursor.setMinutes(cursor.getMinutes() + 30);
+    }
+
+    return Array.from(hours);
+  }
+
+  private startOfDay(date: Date): Date {
+    return new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  }
+
+  private anchorTime(date: Date): Date {
+    return new Date(2000, 0, 1, date.getHours(), date.getMinutes(), 0, 0);
+  }
+
+  isDateAllowed = (date: Date | null): boolean => {
+    if (!date || !this.minAllowedDate || !this.maxAllowedDate) {
+      return false;
+    }
+
+    const day = this.startOfDay(date).getTime();
+    return day >= this.minAllowedDate.getTime() && day <= this.maxAllowedDate.getTime();
+  }
+
+  private setScheduleControlsEnabled(enabled: boolean): void {
+    const controls = ['dataAtividade', 'inicioHora', 'fimHora'];
+
+    for (const controlName of controls) {
+      const control = this.activityForm.get(controlName);
+      if (!control) {
+        continue;
+      }
+
+      if (enabled) {
+        control.enable({ emitEvent: false });
+      } else {
+        control.disable({ emitEvent: false });
       }
     }
-    return hours;
   }
 
   getFilteredTags(): TagModel[] {

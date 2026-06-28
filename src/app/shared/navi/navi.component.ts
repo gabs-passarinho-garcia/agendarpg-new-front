@@ -66,7 +66,7 @@ export class NaviComponent {
   }
 
   get isAdmin(): boolean {
-    const adminTypes = ['CRD', 'ADM'];
+    const adminTypes = ['ADM'];
     return this.isLoggedIn && adminTypes.includes(this.userType);
   }
 

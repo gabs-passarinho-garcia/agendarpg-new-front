@@ -19,6 +19,7 @@ import { UserManagementComponent } from './components/admin/user-management/user
 import { EventManagementComponent } from './components/admin/event-management/event-management.component';
 import { TagManagementComponent } from './components/admin/tag-management/tag-management.component';
 import { AdminGuard } from './guards/admin.guard';
+import { CoordinatorAdminGuard } from './guards/coordinator-admin.guard';
 
 export const routes: Routes = [
   { path: '',         redirectTo: 'dashboard',    pathMatch: 'full' },
@@ -31,7 +32,7 @@ export const routes: Routes = [
   {
     path: 'novo-evento',
     component: NewEventComponent,
-    canActivate: [AuthGuard, AdminGuard]
+    canActivate: [AuthGuard, CoordinatorAdminGuard]
   },
   {
     path: 'meus-eventos',
