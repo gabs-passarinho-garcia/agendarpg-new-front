@@ -1,6 +1,6 @@
-import { Component, Inject } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { MatDialogModule, MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -8,7 +8,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { UserService } from '../../services/user/user.service';
-import { ChangePasswordProfileModel } from '../../models/changePasswordProfile';
+
+type ChangePasswordStep = 'confirm' | 'code' | 'new-password' | 'result';
 
 @Component({
   selector: 'app-change-password-modal',
@@ -26,35 +27,41 @@ import { ChangePasswordProfileModel } from '../../models/changePasswordProfile';
   template: `
     <div class="change-password-modal">
       <div class="modal-header">
-        <h2 mat-dialog-title>Alterar Senha</h2>
-        <button mat-icon-button (click)="onClose()">
+        <h2 mat-dialog-title>{{ getTitle() }}</h2>
+        <button mat-icon-button (click)="onClose()" [disabled]="loading">
           <mat-icon>close</mat-icon>
         </button>
       </div>
 
       <mat-dialog-content class="modal-content">
-        <form [formGroup]="passwordForm" class="password-form">
+        <div *ngIf="step === 'confirm'" class="confirm-container">
+          <p class="confirm-message">Você realmente deseja trocar sua senha?</p>
+          <p class="confirm-subtitle">Enviaremos um código de validação para o e-mail cadastrado.</p>
+        </div>
+
+        <form *ngIf="step === 'code'" [formGroup]="codeForm" class="password-form">
+          <p class="step-description">Informe o código recebido por e-mail para continuar.</p>
+
           <mat-form-field appearance="outline" class="full-width">
-            <mat-label>Senha Atual</mat-label>
+            <mat-label>Código de verificação</mat-label>
             <input
               matInput
-              [type]="hideCurrentPassword ? 'password' : 'text'"
-              formControlName="currentPassword"
-              placeholder="Digite sua senha atual"
-              autocomplete="current-password">
-            <button
-              mat-icon-button
-              matSuffix
-              type="button"
-              (click)="hideCurrentPassword = !hideCurrentPassword"
-              [attr.aria-label]="'Hide password'"
-              [attr.aria-pressed]="hideCurrentPassword">
-              <mat-icon>{{hideCurrentPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
-            </button>
-            <mat-error *ngIf="passwordForm.get('currentPassword')?.hasError('required')">
-              Senha atual é obrigatória
+              formControlName="code"
+              placeholder="Digite o código de 6 dígitos"
+              inputmode="numeric"
+              maxlength="6"
+              autocomplete="one-time-code">
+            <mat-error *ngIf="codeForm.get('code')?.hasError('required')">
+              Código é obrigatório
+            </mat-error>
+            <mat-error *ngIf="codeForm.get('code')?.hasError('pattern')">
+              O código deve conter 6 dígitos
             </mat-error>
           </mat-form-field>
+        </form>
+
+        <form *ngIf="step === 'new-password'" [formGroup]="newPasswordForm" class="password-form">
+          <p class="step-description">Código validado. Defina sua nova senha.</p>
 
           <mat-form-field appearance="outline" class="full-width">
             <mat-label>Nova Senha</mat-label>
@@ -69,14 +76,14 @@ import { ChangePasswordProfileModel } from '../../models/changePasswordProfile';
               matSuffix
               type="button"
               (click)="hideNewPassword = !hideNewPassword"
-              [attr.aria-label]="'Hide password'"
+              [attr.aria-label]="'Mostrar/ocultar senha'"
               [attr.aria-pressed]="hideNewPassword">
               <mat-icon>{{hideNewPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
             </button>
-            <mat-error *ngIf="passwordForm.get('newPassword')?.hasError('required')">
+            <mat-error *ngIf="newPasswordForm.get('newPassword')?.hasError('required')">
               Nova senha é obrigatória
             </mat-error>
-            <mat-error *ngIf="passwordForm.get('newPassword')?.hasError('minlength')">
+            <mat-error *ngIf="newPasswordForm.get('newPassword')?.hasError('minlength')">
               Nova senha deve ter pelo menos 6 caracteres
             </mat-error>
           </mat-form-field>
@@ -94,14 +101,14 @@ import { ChangePasswordProfileModel } from '../../models/changePasswordProfile';
               matSuffix
               type="button"
               (click)="hideConfirmPassword = !hideConfirmPassword"
-              [attr.aria-label]="'Hide password'"
+              [attr.aria-label]="'Mostrar/ocultar senha'"
               [attr.aria-pressed]="hideConfirmPassword">
               <mat-icon>{{hideConfirmPassword ? 'visibility_off' : 'visibility'}}</mat-icon>
             </button>
-            <mat-error *ngIf="passwordForm.get('confirmPassword')?.hasError('required')">
+            <mat-error *ngIf="newPasswordForm.get('confirmPassword')?.hasError('required')">
               Confirmação de senha é obrigatória
             </mat-error>
-            <mat-error *ngIf="passwordForm.hasError('passwordMismatch') && !passwordForm.get('confirmPassword')?.hasError('required')">
+            <mat-error *ngIf="newPasswordForm.hasError('passwordMismatch') && !newPasswordForm.get('confirmPassword')?.hasError('required')">
               As senhas não conferem
             </mat-error>
           </mat-form-field>
@@ -114,44 +121,119 @@ import { ChangePasswordProfileModel } from '../../models/changePasswordProfile';
             </ul>
           </div>
         </form>
+
+        <div *ngIf="step === 'result'" class="result-container">
+          <div class="result-icon" [class.success]="resultSuccess" [class.error]="!resultSuccess">
+            <mat-icon>{{ resultSuccess ? 'check_circle' : 'cancel' }}</mat-icon>
+          </div>
+          <h3>{{ resultSuccess ? 'Senha alterada com sucesso!' : 'Não foi possível alterar a senha' }}</h3>
+          <p>
+            {{ resultSuccess
+              ? 'Sua senha foi atualizada. Use a nova senha no próximo login.'
+              : 'Houve um problema interno ao trocar a senha e ela não foi alterada.' }}
+          </p>
+        </div>
       </mat-dialog-content>
 
       <mat-dialog-actions class="modal-actions">
-        <button mat-stroked-button (click)="onClose()" [disabled]="loading">
-          Cancelar
-        </button>
-        <button
-          mat-raised-button
-          color="primary"
-          (click)="onChangePassword()"
-          [disabled]="!passwordForm.valid || loading">
-          <mat-icon *ngIf="loading">hourglass_empty</mat-icon>
-          {{loading ? 'Alterando...' : 'Alterar Senha'}}
-        </button>
+        <ng-container [ngSwitch]="step">
+          <ng-container *ngSwitchCase="'confirm'">
+            <button mat-stroked-button (click)="onClose()" [disabled]="loading">
+              Cancelar
+            </button>
+            <button
+              mat-raised-button
+              color="primary"
+              (click)="onRequestCode()"
+              [disabled]="loading">
+              <mat-icon class="loading-icon" *ngIf="loading">hourglass_empty</mat-icon>
+              {{loading ? 'Enviando...' : 'Aceitar'}}
+            </button>
+          </ng-container>
+
+          <ng-container *ngSwitchCase="'code'">
+            <button mat-stroked-button (click)="onClose()" [disabled]="loading">
+              Cancelar
+            </button>
+            <button
+              mat-raised-button
+              color="primary"
+              (click)="onValidateCode()"
+              [disabled]="!codeForm.valid || loading">
+              <mat-icon class="loading-icon" *ngIf="loading">hourglass_empty</mat-icon>
+              {{loading ? 'Validando...' : 'Validar Código'}}
+            </button>
+          </ng-container>
+
+          <ng-container *ngSwitchCase="'new-password'">
+            <button mat-stroked-button (click)="onClose()" [disabled]="loading">
+              Cancelar
+            </button>
+            <button
+              mat-raised-button
+              color="primary"
+              (click)="onConfirmPasswordChange()"
+              [disabled]="!newPasswordForm.valid || loading">
+              <mat-icon class="loading-icon" *ngIf="loading">hourglass_empty</mat-icon>
+              {{loading ? 'Alterando...' : 'Alterar Senha'}}
+            </button>
+          </ng-container>
+
+          <ng-container *ngSwitchCase="'result'">
+            <button
+              mat-raised-button
+              color="primary"
+              class="single-action"
+              (click)="onClose()">
+              OK
+            </button>
+          </ng-container>
+        </ng-container>
       </mat-dialog-actions>
     </div>
   `,
   styleUrls: ['./change-password-modal.component.scss']
 })
 export class ChangePasswordModalComponent {
-  passwordForm: FormGroup;
-  hideCurrentPassword = true;
+  step: ChangePasswordStep = 'confirm';
+  codeForm: FormGroup;
+  newPasswordForm: FormGroup;
   hideNewPassword = true;
   hideConfirmPassword = true;
   loading = false;
+  verificationToken = '';
+  resultSuccess = false;
 
   constructor(
     private fb: FormBuilder,
     private userService: UserService,
     private snackBar: MatSnackBar,
-    public dialogRef: MatDialogRef<ChangePasswordModalComponent>,
-    @Inject(MAT_DIALOG_DATA) public data: any
+    public dialogRef: MatDialogRef<ChangePasswordModalComponent>
   ) {
-    this.passwordForm = this.fb.group({
-      currentPassword: ['', [Validators.required]],
+    this.codeForm = this.fb.group({
+      code: ['', [Validators.required, Validators.pattern(/^\d{6}$/)]]
+    });
+
+    this.newPasswordForm = this.fb.group({
       newPassword: ['', [Validators.required, Validators.minLength(6)]],
       confirmPassword: ['', [Validators.required]]
     }, { validators: this.passwordMatchValidator });
+  }
+
+  getTitle(): string {
+    if (this.step === 'confirm') {
+      return 'Trocar Senha';
+    }
+
+    if (this.step === 'code') {
+      return 'Validar Código';
+    }
+
+    if (this.step === 'new-password') {
+      return 'Nova Senha';
+    }
+
+    return 'Resultado';
   }
 
   private passwordMatchValidator(form: FormGroup) {
@@ -164,56 +246,81 @@ export class ChangePasswordModalComponent {
     return null;
   }
 
-  onChangePassword(): void {
-    if (this.passwordForm.valid) {
-      this.loading = true;
+  onRequestCode(): void {
+    this.loading = true;
+    this.userService.requestChangePasswordCode().subscribe({
+      next: () => {
+        this.loading = false;
+        this.step = 'code';
+        this.snackBar.open('Código enviado para o seu e-mail cadastrado.', 'Fechar', {
+          duration: 3500,
+          panelClass: ['snackbar-success']
+        });
+      },
+      error: (error) => {
+        this.loading = false;
+        const errorMessage = error?.error?.message || 'Não foi possível solicitar o código agora. Tente novamente.';
+        this.snackBar.open(errorMessage, 'Fechar', {
+          duration: 4000,
+          panelClass: ['snackbar-error']
+        });
+      }
+    });
+  }
 
-      const changePasswordData: ChangePasswordProfileModel = {
-        senhaAtual: this.passwordForm.get('currentPassword')?.value,
-        novaSenha: this.passwordForm.get('newPassword')?.value,
-        confirmacaoNovaSenha: this.passwordForm.get('confirmPassword')?.value
-      };
-
-      this.userService.changePassword(changePasswordData).subscribe({
-        next: (response) => {
-          this.loading = false;
-          this.snackBar.open(
-            'Senha alterada com sucesso!',
-            'Fechar',
-            {
-              duration: 3000,
-              panelClass: ['snackbar-success']
-            }
-          );
-          this.dialogRef.close(true);
-        },
-        error: (error) => {
-          this.loading = false;
-          console.error('Erro ao alterar senha:', error);
-
-          let errorMessage = 'Erro ao alterar senha. Tente novamente.';
-
-          // Verificar se é erro de senha atual incorreta
-          if (error.status === 400 || error.status === 401) {
-            errorMessage = 'Senha atual incorreta. Verifique e tente novamente.';
-          } else if (error.status === 422) {
-            errorMessage = 'Dados inválidos. Verifique os campos e tente novamente.';
-          }
-
-          this.snackBar.open(
-            errorMessage,
-            'Fechar',
-            {
-              duration: 4000,
-              panelClass: ['snackbar-error']
-            }
-          );
-        }
-      });
+  onValidateCode(): void {
+    if (!this.codeForm.valid) {
+      this.codeForm.markAllAsTouched();
+      return;
     }
+
+    this.loading = true;
+    const code = this.codeForm.get('code')?.value;
+
+    this.userService.validateChangePasswordCode(code).subscribe({
+      next: (response) => {
+        this.loading = false;
+        this.verificationToken = response.data || '';
+        this.step = 'new-password';
+      },
+      error: (error) => {
+        this.loading = false;
+        const errorMessage = error?.error?.message || 'Código inválido ou expirado.';
+        this.snackBar.open(errorMessage, 'Fechar', {
+          duration: 4000,
+          panelClass: ['snackbar-error']
+        });
+      }
+    });
+  }
+
+  onConfirmPasswordChange(): void {
+    if (!this.newPasswordForm.valid || !this.verificationToken) {
+      this.newPasswordForm.markAllAsTouched();
+      return;
+    }
+
+    this.loading = true;
+
+    this.userService.confirmChangePassword({
+      novaSenha: this.newPasswordForm.get('newPassword')?.value,
+      confirmacaoNovaSenha: this.newPasswordForm.get('confirmPassword')?.value,
+      tokenVerificacao: this.verificationToken
+    }).subscribe({
+      next: () => {
+        this.loading = false;
+        this.resultSuccess = true;
+        this.step = 'result';
+      },
+      error: () => {
+        this.loading = false;
+        this.resultSuccess = false;
+        this.step = 'result';
+      }
+    });
   }
 
   onClose(): void {
-    this.dialogRef.close(false);
+    this.dialogRef.close(this.resultSuccess);
   }
 }

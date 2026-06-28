@@ -76,6 +76,40 @@ export class UserService {
     );
   }
 
+  requestChangePasswordCode(): Observable<ResponseModel<string>> {
+    const token = this.stateService.token;
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.post<ResponseModel<string>>(
+      `${this.API_URL}/change-password/request-code`,
+      {},
+      { headers }
+    );
+  }
+
+  validateChangePasswordCode(code: string): Observable<ResponseModel<string>> {
+    const token = this.stateService.token;
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.post<ResponseModel<string>>(
+      `${this.API_URL}/change-password/validate-code`,
+      { code },
+      { headers }
+    );
+  }
+
+  confirmChangePassword(payload: {
+    novaSenha: string;
+    confirmacaoNovaSenha: string;
+    tokenVerificacao: string;
+  }): Observable<ResponseModel<void>> {
+    const token = this.stateService.token;
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.put<ResponseModel<void>>(
+      `${this.API_URL}/change-password/confirm`,
+      payload,
+      { headers }
+    );
+  }
+
   resendActivationEmail(email: string): Observable<ResponseModel<void>> {
     return this.http.post<ResponseModel<void>>(
       `${this.API_EMAIL_VERIFICATION_URL}/resend-verification`,
