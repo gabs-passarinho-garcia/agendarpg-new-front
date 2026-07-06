@@ -100,7 +100,7 @@ export class DashboardComponent implements OnInit, OnDestroy {
 
   onActivityClicked(activity: ActivityModel, event: EventModelV2): void {
     this.dialog.open(EventModalComponent, {
-      data: event,
+      data: { event, selectedActivityId: activity.id },
       maxWidth: '90vw',
       maxHeight: '90vh'
     });

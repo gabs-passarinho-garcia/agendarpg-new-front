@@ -15,6 +15,11 @@ import { EventUpdateService } from '../../services/event/event-update.service';
 import { StateService } from '../../services/state/state.service';
 import { UserService } from '../../services/user/user.service';
 
+export interface EventModalData {
+  event: EventModelV2;
+  selectedActivityId?: number | string;
+}
+
 @Component({
   selector: 'app-event-modal',
   standalone: true,
@@ -36,16 +41,21 @@ export class EventModalComponent implements OnInit {
   loadingActivities = true;
   narratorNames: Record<string, string> = {};
   readonly activityType = ActivityType;
+  readonly event: EventModelV2;
+  private readonly selectedActivityId?: number | string;
 
   constructor(
-    @Inject(MAT_DIALOG_DATA) public event: EventModelV2,
+    @Inject(MAT_DIALOG_DATA) data: EventModalData,
     public dialogRef: MatDialogRef<EventModalComponent>,
     private stateService: StateService,
     private activityApiService: ActivityApiService,
     private eventUpdateService: EventUpdateService,
     private userService: UserService,
     private snackBar: MatSnackBar
-  ) {}
+  ) {
+    this.event = data.event;
+    this.selectedActivityId = data.selectedActivityId;
+  }
 
   ngOnInit(): void {
     this.loadActivities();
@@ -67,7 +77,10 @@ export class EventModalComponent implements OnInit {
 
     this.activityApiService.getByEvent(this.event.id).subscribe({
       next: (response) => {
-        this.activities = response.data ?? [];
+        const allActivities = response.data ?? [];
+        this.activities = this.selectedActivityId !== undefined
+          ? allActivities.filter((activity) => String(activity.id) === String(this.selectedActivityId))
+          : allActivities;
         this.preloadNarratorNames(this.activities);
       },
       error: (error) => {

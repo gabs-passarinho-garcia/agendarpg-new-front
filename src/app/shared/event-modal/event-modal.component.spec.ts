@@ -46,12 +46,14 @@ describe('EventModalComponent', () => {
         {
           provide: MAT_DIALOG_DATA,
           useValue: {
-            id: 1,
-            nome: 'Evento Teste',
-            local: 'Local',
-            inicio: '2026-12-01T10:00:00',
-            fim: '2026-12-01T12:00:00',
-            atividades: []
+            event: {
+              id: 1,
+              nome: 'Evento Teste',
+              local: 'Local',
+              inicio: '2026-12-01T10:00:00',
+              fim: '2026-12-01T12:00:00',
+              atividades: []
+            }
           }
         },
         { provide: MatDialogRef, useValue: { close: jasmine.createSpy('close') } },

@@ -42,7 +42,7 @@ export class EventCardComponent {
 
   openModal(): void {
     const dialogRef = this.dialog.open(EventModalComponent, {
-      data: this.event,
+      data: { event: this.event },
       maxWidth: '90vw',
       maxHeight: '90vh'
     });
