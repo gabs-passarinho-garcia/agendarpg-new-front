@@ -1,12 +1,13 @@
 /* tslint:disable:no-unused-variable */
 
 import { TestBed, async, inject } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
 import { UserAdminService } from './user-admin.service';
 
 describe('Service: UserAdmin', () => {
   beforeEach(() => {
     TestBed.configureTestingModule({
-      providers: [UserAdminService]
+      providers: [UserAdminService, provideHttpClient()]
     });
   });
 

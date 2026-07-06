@@ -1,4 +1,7 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideHttpClient } from '@angular/common/http';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
+import { provideRouter } from '@angular/router';
 
 import { UserProfileComponent } from './user-profile.component';
 
@@ -8,7 +11,8 @@ describe('UserProfileComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [UserProfileComponent]
+      imports: [UserProfileComponent],
+      providers: [provideHttpClient(), provideRouter([]), provideNoopAnimations()]
     })
     .compileComponents();
     

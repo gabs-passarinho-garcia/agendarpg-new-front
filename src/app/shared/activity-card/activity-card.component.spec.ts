@@ -1,15 +1,28 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { of, throwError } from 'rxjs';
 import { ActivityCardComponent } from './activity-card.component';
 import { ActivityModel } from '../../models/activity.model';
 import { ActivityType } from '../../models/activity-type.enum';
+import { UserService } from '../../services/user/user.service';
+import { StateService } from '../../services/state/state.service';
 
 describe('ActivityCardComponent', () => {
   let component: ActivityCardComponent;
   let fixture: ComponentFixture<ActivityCardComponent>;
+  let userServiceSpy: jasmine.SpyObj<UserService>;
+  const stateServiceMock = { isLoggedIn: true };
 
   beforeEach(async () => {
+    stateServiceMock.isLoggedIn = true;
+    userServiceSpy = jasmine.createSpyObj<UserService>('UserService', ['getUserName']);
+    userServiceSpy.getUserName.and.returnValue(of({ data: { apelido: 'Jogador' } } as any));
+
     await TestBed.configureTestingModule({
-      imports: [ActivityCardComponent]
+      imports: [ActivityCardComponent],
+      providers: [
+        { provide: UserService, useValue: userServiceSpy },
+        { provide: StateService, useValue: stateServiceMock }
+      ]
     }).compileComponents();
 
     fixture = TestBed.createComponent(ActivityCardComponent);
@@ -62,5 +75,41 @@ describe('ActivityCardComponent', () => {
   it('nao deve indicar lotado quando ainda ha vagas', () => {
     component.activity.participantes = [1, 2, 3, 4];
     expect(component.isFull).toBeFalse();
+  });
+
+  it('deve montar os icones de vaga preenchidos e vazios', () => {
+    component.activity.numeroVagas = 4;
+    component.activity.participantes = [1, 2];
+
+    expect(component.vacancySlots).toEqual([true, true, false, false]);
+    expect(component.vacancyAriaLabel).toBe('Vagas ocupadas 2 de 4');
+  });
+
+  it('deve carregar os apelidos dos participantes inscritos', () => {
+    userServiceSpy.getUserName.and.callFake((id) =>
+      of({ data: { apelido: `Apelido${id}` } } as any)
+    );
+
+    component.ngOnChanges({ activity: {} as any });
+
+    expect(userServiceSpy.getUserName).toHaveBeenCalledTimes(3);
+    expect(component.participantNicknames).toEqual(['Apelido1', 'Apelido2', 'Apelido3']);
+  });
+
+  it('deve usar nome de fallback quando a busca de apelido falha', () => {
+    userServiceSpy.getUserName.and.returnValue(throwError(() => new Error('erro')));
+
+    component.ngOnChanges({ activity: {} as any });
+
+    expect(component.participantNicknames).toEqual(['Jogador #1', 'Jogador #2', 'Jogador #3']);
+  });
+
+  it('nao deve buscar apelidos quando o usuario nao esta logado', () => {
+    stateServiceMock.isLoggedIn = false;
+
+    component.ngOnChanges({ activity: {} as any });
+
+    expect(userServiceSpy.getUserName).not.toHaveBeenCalled();
+    expect(component.participantNicknames).toEqual([]);
   });
 });

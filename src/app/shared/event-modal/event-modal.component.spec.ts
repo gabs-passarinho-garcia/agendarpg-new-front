@@ -37,8 +37,9 @@ describe('EventModalComponent', () => {
     activityApiServiceSpy.register.and.returnValue(of({} as any));
     activityApiServiceSpy.unregister.and.returnValue(of({} as any));
 
-    userServiceSpy = jasmine.createSpyObj<UserService>('UserService', ['getNarratorName']);
+    userServiceSpy = jasmine.createSpyObj<UserService>('UserService', ['getNarratorName', 'getUserName']);
     userServiceSpy.getNarratorName.and.returnValue(of({ data: { apelido: 'Narrador' } } as any));
+    userServiceSpy.getUserName.and.returnValue(of({ data: { apelido: 'Jogador' } } as any));
 
     await TestBed.configureTestingModule({
       imports: [EventModalComponent],
@@ -121,5 +122,20 @@ describe('EventModalComponent', () => {
 
     expect(component.getVacancySlots(activity)).toEqual([true, true, false, false]);
     expect(component.getVacancyAriaLabel(activity)).toBe('Vagas ocupadas 2 de 4');
+  });
+
+  it('should load participant nicknames only when logged in', () => {
+    const activity = createRpgActivity({ participantes: [1, 2] });
+
+    stateServiceMock.isLoggedIn = false;
+    component.preloadParticipantNames([activity]);
+    expect(userServiceSpy.getUserName).not.toHaveBeenCalled();
+
+    stateServiceMock.isLoggedIn = true;
+    userServiceSpy.getUserName.and.callFake((id) => of({ data: { apelido: `Apelido${id}` } } as any));
+    component.preloadParticipantNames([activity]);
+
+    expect(userServiceSpy.getUserName).toHaveBeenCalledTimes(2);
+    expect(component.getParticipantNicknames(activity)).toEqual(['Apelido1', 'Apelido2']);
   });
 });

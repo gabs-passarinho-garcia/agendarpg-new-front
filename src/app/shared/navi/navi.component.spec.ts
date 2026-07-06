@@ -1,4 +1,6 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
+import { provideRouter } from '@angular/router';
 
 import { NaviComponent } from './navi.component';
 
@@ -8,7 +10,8 @@ describe('NaviComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      imports: [NaviComponent]
+      imports: [NaviComponent],
+      providers: [provideNoopAnimations(), provideRouter([])]
     })
     .compileComponents();
     

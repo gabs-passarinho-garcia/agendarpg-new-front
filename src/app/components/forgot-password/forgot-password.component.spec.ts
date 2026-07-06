@@ -2,6 +2,9 @@
 import { async, ComponentFixture, TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
 import { DebugElement } from '@angular/core';
+import { provideHttpClient } from '@angular/common/http';
+import { provideNoopAnimations } from '@angular/platform-browser/animations';
+import { provideRouter } from '@angular/router';
 
 import { ForgotPasswordComponent } from './forgot-password.component';
 
@@ -11,7 +14,8 @@ describe('ForgotPasswordComponent', () => {
 
   beforeEach(async(() => {
     TestBed.configureTestingModule({
-      declarations: [ ForgotPasswordComponent ]
+      imports: [ ForgotPasswordComponent ],
+      providers: [provideHttpClient(), provideRouter([]), provideNoopAnimations()]
     })
     .compileComponents();
   }));
