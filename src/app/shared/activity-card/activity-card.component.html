@@ -51,6 +51,22 @@
           <span>{{ activity.numeroVagas }} vagas</span>
         </div>
 
+        @if (vacancySlots.length > 0) {
+          <div class="vacancy-icons" [attr.aria-label]="vacancyAriaLabel">
+            @for (filled of vacancySlots; track $index) {
+              <mat-icon [class.filled]="filled" [class.empty]="!filled">
+                {{ filled ? 'person' : 'person_outline' }}
+              </mat-icon>
+            }
+          </div>
+        }
+
+        @if (participantNicknames.length > 0) {
+          <div class="participant-nicknames">
+            {{ participantNicknames.join(', ') }}
+          </div>
+        }
+
         @if (isFull) {
           <div class="status-badge full">
             <mat-icon>warning</mat-icon>

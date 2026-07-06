@@ -39,6 +39,20 @@
               <td mat-cell *matCellDef="let activity">{{ activity.localComplemento }}</td>
             </ng-container>
 
+            <ng-container matColumnDef="acoes">
+              <th mat-header-cell *matHeaderCellDef>Acoes</th>
+              <td mat-cell *matCellDef="let activity">
+                <button
+                  mat-button
+                  color="primary"
+                  [disabled]="loadingActivityId === activity.id"
+                  (click)="verDetalhes(activity)">
+                  <mat-icon>info</mat-icon>
+                  Ver Detalhes
+                </button>
+              </td>
+            </ng-container>
+
             <tr mat-header-row *matHeaderRowDef="displayedColumns"></tr>
             <tr mat-row *matRowDef="let row; columns: displayedColumns;"></tr>
           </table>

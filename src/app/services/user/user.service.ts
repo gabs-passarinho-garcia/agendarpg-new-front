@@ -8,6 +8,7 @@ import { StateService } from '../state/state.service';
 import { NarratorNicknameModel } from '../../models/narratorNickname';
 import { NarratorOption } from '../../models/narrator-option.model';
 import { ChangePasswordProfileModel } from '../../models/changePasswordProfile';
+import { UserNameModel } from '../../models/user-name.model';
 
 @Injectable({
   providedIn: 'root'
@@ -52,6 +53,15 @@ export class UserService {
     const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
     return this.http.get<ResponseModel<NarratorOption[]>>(
       `${this.API_URL}/narrators`,
+      { headers }
+    );
+  }
+
+  getUserName(userId: string | number): Observable<ResponseModel<UserNameModel>> {
+    const token = this.stateService.token;
+    const headers = new HttpHeaders().set('Authorization', `Bearer ${token}`);
+    return this.http.get<ResponseModel<UserNameModel>>(
+      `${this.API_URL}/name/${encodeURIComponent(String(userId))}`,
       { headers }
     );
   }

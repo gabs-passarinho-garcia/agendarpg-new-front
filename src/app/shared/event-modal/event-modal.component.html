@@ -59,6 +59,12 @@
             <ng-template #noVacancyInfo>
               <span>-</span>
             </ng-template>
+
+            <ng-container *ngIf="isLoggedIn && getParticipantNicknames(activity) as nicknames">
+              <div class="participant-nicknames" *ngIf="nicknames.length > 0">
+                <span class="nickname-chip" *ngFor="let nickname of nicknames">{{ nickname }}</span>
+              </div>
+            </ng-container>
           </div>
 
           <div class="detail-item" *ngIf="activity.tipo === activityType.RPG_MESA && activity.tags && activity.tags.length > 0">
@@ -77,6 +83,7 @@
           </div>
 
           <button
+            class="register-toggle-button"
             mat-raised-button
             [color]="isUserRegistered(activity) ? 'warn' : 'primary'"
             [disabled]="!canRegister(activity) && !canUnregister(activity)"

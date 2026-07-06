@@ -40,6 +40,7 @@ export class EventModalComponent implements OnInit {
   activities: ActivityModel[] = [];
   loadingActivities = true;
   narratorNames: Record<string, string> = {};
+  participantNames: Record<string, string> = {};
   readonly activityType = ActivityType;
   readonly event: EventModelV2;
   private readonly selectedActivityId?: number | string;
@@ -82,6 +83,7 @@ export class EventModalComponent implements OnInit {
           ? allActivities.filter((activity) => String(activity.id) === String(this.selectedActivityId))
           : allActivities;
         this.preloadNarratorNames(this.activities);
+        this.preloadParticipantNames(this.activities);
       },
       error: (error) => {
         console.error('Erro ao carregar atividades:', error);
@@ -124,6 +126,40 @@ export class EventModalComponent implements OnInit {
     }
     const narratorIdAsString = String(activity.narradorId);
     return this.narratorNames[narratorIdAsString] || `Narrador #${narratorIdAsString}`;
+  }
+
+  preloadParticipantNames(activities: ActivityModel[]): void {
+    if (!this.isLoggedIn) {
+      return;
+    }
+
+    const participantIds = activities
+      .flatMap((activity) => activity.participantes ?? [])
+      .filter((id): id is number => id !== null && id !== undefined);
+
+    participantIds.forEach((id) => {
+      const idAsString = String(id);
+
+      if (this.participantNames[idAsString]) {
+        return;
+      }
+
+      this.participantNames[idAsString] = `Jogador #${idAsString}`;
+
+      this.userService.getUserName(id).subscribe({
+        next: (response) => {
+          this.participantNames[idAsString] = response.data?.apelido || response.data?.nomeCompleto || `Jogador #${idAsString}`;
+        },
+        error: () => {
+          this.participantNames[idAsString] = `Jogador #${idAsString}`;
+        }
+      });
+    });
+  }
+
+  getParticipantNicknames(activity: ActivityModel): string[] {
+    const participants = activity.participantes ?? [];
+    return participants.map((id) => this.participantNames[String(id)] || `Jogador #${id}`);
   }
 
   isUserRegistered(activity: ActivityModel): boolean {
